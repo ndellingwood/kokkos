@@ -144,6 +144,7 @@ namespace Kokkos { namespace Experimental { namespace Impl {
 //#define IVDEP_TEMP
 
 #if defined( KOKKOS_COMPILER_CLANG )
+  #pragma clang diagnostic push
   #pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
 #endif
 
@@ -460,6 +461,10 @@ namespace Kokkos { namespace Experimental { namespace Impl {
   if (cond) { LOOP_LAYOUT_8_REDUX( val, func, type, is_left, m_offset, extent_full, rank ) } \
   else      { LOOP_LAYOUT_8_REDUX( val, func, type, is_left, m_offset, extent_partial, rank ) }
 
+
+#if defined( KOKKOS_COMPILER_CLANG )
+  #pragma clang diagnostic pop
+#endif
 
 // end New Loop Macros
 
