@@ -102,7 +102,8 @@ struct TestMDRange_2D {
 //      using begin_type = Kokkos::Experimental::Begin;
 
       //auto range = MDRangePolicy< ExecSpace, Rank<2>, Kokkos::IndexType<int> > ( Begin(0,0), End(N0,N1), Tile(3,3) );
-      auto range = Kokkos::Experimental::MDRangePolicy( Begin(0,0), End(N0,N1), Tile(3,3), Kokkos::Impl::PolicyTraits< ExecSpace, Rank<2>, Kokkos::IndexType<int> >{} );
+      //auto range = Kokkos::Experimental::MDRangePolicy( Begin(0,0), End(N0,N1), Tile(3,3), Kokkos::Impl::PolicyTraits< ExecSpace, Rank<2>, Kokkos::IndexType<int> >{} );
+      auto range = Kokkos::Experimental::MDRangePolicy( Begin(0,0), End(N0,N1), Tile(3,3), Kokkos::MDRangePolicyTraits< ExecSpace, Rank<2>, Kokkos::IndexType<int> >{} );
 
       TestMDRange_2D functor(N0,N1);
 
@@ -208,7 +209,8 @@ struct TestMDRange_2D {
       range_type range( point_type{{0,0}}, point_type{{N0,N1}}, tile_type{{3,3}} );
 */
       //auto range = MDRangePolicy< ExecSpace, Rank<2>, Kokkos::IndexType<int> > ( Begin(0,0), End(N0,N1), Tile(3,3) );
-      auto range = Kokkos::Experimental::MDRangePolicy( Begin(0,0), End(N0,N1), Tile(3,3), Kokkos::Impl::PolicyTraits< ExecSpace, Rank<2>, Kokkos::IndexType<int> >{} );
+      //auto range = Kokkos::Experimental::MDRangePolicy( Begin(0,0), End(N0,N1), Tile(3,3), Kokkos::Impl::PolicyTraits< ExecSpace, Rank<2>, Kokkos::IndexType<int> >{} );
+      auto range = Kokkos::Experimental::MDRangePolicy( Begin(0,0), End(N0,N1), Tile(3,3), Kokkos::MDRangePolicyTraits< ExecSpace, Rank<2>, Kokkos::IndexType<int> >{} );
 
       TestMDRange_2D functor(N0,N1);
 
@@ -431,7 +433,8 @@ struct TestMDRange_3D {
       //auto range = MDRangePolicy< ExecSpace, Rank<3>, Kokkos::IndexType<int> > (Begin(0,0,0), End(N0,N1,N2), Tile(3,3,3) );
       //typedef Kokkos::Impl::PolicyTraits< ExecSpace, Rank<3>, Kokkos::IndexType<int> > MDRangePolicyTraits;
       //auto range = MDRangePolicy<MDRangePolicyTraits>( Begin(0,0,0), End(N0,N1,N2), Tile(3,3,3) );
-      auto range = Kokkos::Experimental::MDRangePolicy( Begin(0,0,0), End(N0,N1,N2), Tile(3,3,3), Kokkos::Impl::PolicyTraits< ExecSpace, Rank<3>, Kokkos::IndexType<int> >{} );
+      //auto range = Kokkos::Experimental::MDRangePolicy( Begin(0,0,0), End(N0,N1,N2), Tile(3,3,3), Kokkos::Impl::PolicyTraits< ExecSpace, Rank<3>, Kokkos::IndexType<int> >{} );
+      auto range = Kokkos::Experimental::MDRangePolicy( Begin(0,0,0), End(N0,N1,N2), Tile(3,3,3), Kokkos::MDRangePolicyTraits< ExecSpace, Rank<3>, Kokkos::IndexType<int> >{} );
 
       TestMDRange_3D functor(N0,N1,N2);
 
@@ -537,7 +540,8 @@ struct TestMDRange_3D {
       range_type range( point_type{{0,0,0}}, point_type{{N0,N1,N2}}, tile_type{{3,3,3}} );
 */
       //auto range = MDRangePolicy< ExecSpace, Rank<3>, Kokkos::IndexType<int> > (Begin(0,0,0), End(N0,N1,N2), Tile(3,3,3) );
-      auto range = Kokkos::Experimental::MDRangePolicy( Begin(0,0,0), End(N0,N1,N2), Tile(3,3,3), Kokkos::Impl::PolicyTraits< ExecSpace, Rank<3>, Kokkos::IndexType<int> >{} );
+      //auto range = Kokkos::Experimental::MDRangePolicy( Begin(0,0,0), End(N0,N1,N2), Tile(3,3,3), Kokkos::Impl::PolicyTraits< ExecSpace, Rank<3>, Kokkos::IndexType<int> >{} );
+      auto range = Kokkos::Experimental::MDRangePolicy( Begin(0,0,0), End(N0,N1,N2), Tile(3,3,3), Kokkos::MDRangePolicyTraits< ExecSpace, Rank<3>, Kokkos::IndexType<int> >{} );
 
       TestMDRange_3D functor(N0,N1,N2);
 
@@ -767,7 +771,8 @@ struct TestMDRange_4D {
       range_type range( point_type{{0,0,0,0}}, point_type{{N0,N1,N2,N3}}, tile_type{{3,3,3,3}} );
 */
       //auto range = MDRangePolicy< ExecSpace, Rank<4>, Kokkos::IndexType<int> > (Begin(0,0,0,0), End(N0,N1,N2,N3), Tile(3,3,3,3) );
-      auto range = Kokkos::Experimental::MDRangePolicy( Begin(0,0,0,0), End(N0,N1,N2,N3), Tile(3,3,3,3), Kokkos::Impl::PolicyTraits< ExecSpace, Rank<4>, Kokkos::IndexType<int> >{} );
+      //auto range = Kokkos::Experimental::MDRangePolicy( Begin(0,0,0,0), End(N0,N1,N2,N3), Tile(3,3,3,3), Kokkos::Impl::PolicyTraits< ExecSpace, Rank<4>, Kokkos::IndexType<int> >{} );
+      auto range = Kokkos::Experimental::MDRangePolicy( Begin(0,0,0,0), End(N0,N1,N2,N3), Tile(3,3,3,3), Kokkos::MDRangePolicyTraits< ExecSpace, Rank<4>, Kokkos::IndexType<int> >{} );
 
       TestMDRange_4D functor(N0,N1,N2,N3);
 
@@ -1008,7 +1013,8 @@ struct TestMDRange_5D {
       range_type range( point_type{{0,0,0,0,0}}, point_type{{N0,N1,N2,N3,N4}}, tile_type{{3,3,3,3,3}} );
 */
       //auto range = MDRangePolicy< ExecSpace, Rank<5>, Kokkos::IndexType<int> > (Begin(0,0,0,0,0), End(N0,N1,N2,N3,N4), Tile(3,3,3,3,3) );
-      auto range = Kokkos::Experimental::MDRangePolicy( Begin(0,0,0,0,0), End(N0,N1,N2,N3,N4), Tile(3,3,3,3,3), Kokkos::Impl::PolicyTraits< ExecSpace, Rank<5>, Kokkos::IndexType<int> >{} );
+      //auto range = Kokkos::Experimental::MDRangePolicy( Begin(0,0,0,0,0), End(N0,N1,N2,N3,N4), Tile(3,3,3,3,3), Kokkos::Impl::PolicyTraits< ExecSpace, Rank<5>, Kokkos::IndexType<int> >{} );
+      auto range = Kokkos::Experimental::MDRangePolicy( Begin(0,0,0,0,0), End(N0,N1,N2,N3,N4), Tile(3,3,3,3,3), Kokkos::MDRangePolicyTraits< ExecSpace, Rank<5>, Kokkos::IndexType<int> >{} );
 
       TestMDRange_5D functor(N0,N1,N2,N3,N4);
 
@@ -1257,7 +1263,8 @@ struct TestMDRange_6D {
       range_type range( point_type{{0,0,0,0,0,0}}, point_type{{N0,N1,N2,N3,N4,N5}}, tile_type{{3,3,3,3,3,3}} );
 */
       //auto range = MDRangePolicy< ExecSpace, Rank<6>, Kokkos::IndexType<int> > (Begin(0,0,0,0,0,0), End(N0,N1,N2,N3,N4,N5), Tile(3,3,3,3,3,3) );
-      auto range = Kokkos::Experimental::MDRangePolicy( Begin(0,0,0,0,0,0), End(N0,N1,N2,N3,N4,N5), Tile(3,3,3,3,3,3), Kokkos::Impl::PolicyTraits< ExecSpace, Rank<6>, Kokkos::IndexType<int> >{} );
+      //auto range = Kokkos::Experimental::MDRangePolicy( Begin(0,0,0,0,0,0), End(N0,N1,N2,N3,N4,N5), Tile(3,3,3,3,3,3), Kokkos::Impl::PolicyTraits< ExecSpace, Rank<6>, Kokkos::IndexType<int> >{} );
+      auto range = Kokkos::Experimental::MDRangePolicy( Begin(0,0,0,0,0,0), End(N0,N1,N2,N3,N4,N5), Tile(3,3,3,3,3,3), Kokkos::MDRangePolicyTraits< ExecSpace, Rank<6>, Kokkos::IndexType<int> >{} );
 
       TestMDRange_6D functor(N0,N1,N2,N3,N4,N5);
 

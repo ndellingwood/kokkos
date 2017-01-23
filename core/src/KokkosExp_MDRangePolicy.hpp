@@ -97,6 +97,13 @@ struct ConstArray
     return m_values[I];
   }
 
+  //template <typename VType, int I>
+  //void set( VType val ) 
+  void set(int i , Type val ) 
+  {
+    m_values[i] = val;
+  }
+
   constexpr Type operator[](int i) const
   { return m_values[i]; }
 
@@ -234,8 +241,8 @@ struct ImplMDRangePolicy
   : public Traits
 {
   static_assert( std::is_same< typename Begin::tag, Impl::BeginTag>::value, "ImplMDRangePolicy Error: Not a Begin" );
-  static_assert( std::is_same< typename End::tag, Impl::EndTag>::value, "ImplMDRangePolicy Error: Not a End" );
-  static_assert( std::is_same< typename Tile::tag, Impl::TileTag>::value, "ImplMDRangePolicy Error: Not a Tile" );
+  static_assert( std::is_same< typename End::tag, Impl::EndTag>::value,     "ImplMDRangePolicy Error: Not a End" );
+  static_assert( std::is_same< typename Tile::tag, Impl::TileTag>::value,   "ImplMDRangePolicy Error: Not a Tile" );
 
   using traits = Traits; //Kokkos::Impl::PolicyTraits<Properties ...>;
   using range_policy = RangePolicy< typename traits::execution_space
@@ -275,9 +282,9 @@ struct ImplMDRangePolicy
 
   using index_type  = typename traits::index_type;
   using array_index_type = long;
-//  using point_type  = Kokkos::Array<array_index_type,rank>; //was index_type
+  using point_type  = Kokkos::Array<array_index_type,rank>; //was index_type
+  using tile_end_type  = Tile;
 //  using tile_type   = Kokkos::Array<array_index_type,rank>;
-  using point_type  = Begin; //will remove point_type once compiling...
   using begin_type  = Begin;
   using end_type    = End;
   using tile_type   = Tile;
@@ -290,11 +297,14 @@ struct ImplMDRangePolicy
   // as template parameter to the MDRangePolicy or static_cast the individual values
 
   ImplMDRangePolicy( begin_type const& lower, end_type const& upper, tile_type const& tile, traits const& traits_input = traits{} )
-    : m_lower(lower)
-    , m_upper(upper)
-    , m_tile(tile)
+  //ImplMDRangePolicy( begin_type && lower, end_type && upper, tile_type && tile )
+    : m_lower{lower} //NDE: No ctor for this case, no copy ctor defined...
+    , m_upper{upper}
+    , m_tile{tile}
     , m_num_tiles(1)
+    , m_tile_end( tile_type::fill(1) )
   {
+    //m_tile_end = Impl::ConstArray< index_type , rank , Impl::TileTag >::fill(1) ;
     // Host
     if ( true
        #if defined(KOKKOS_HAVE_CUDA)
@@ -305,6 +315,7 @@ struct ImplMDRangePolicy
       index_type span;
       for (int i=0; i<rank; ++i) {
         span = upper[i] - lower[i];
+        /*
         if ( m_tile[i] <= 0 ) {
           if (  (inner_direction == Right && (i < rank-1))
               || (inner_direction == Left && (i > 0)) )
@@ -315,7 +326,9 @@ struct ImplMDRangePolicy
             m_tile[i] = span;
           }
         }
-        m_tile_end[i] = static_cast<index_type>((span + m_tile[i] -1) / m_tile[i]);
+        */
+        //m_tile_end[i] = static_cast<index_type>((span + m_tile[i] -1) / m_tile[i]);
+        m_tile_end.set(i, static_cast<index_type>((span + m_tile[i] -1) / m_tile[i]) );
         m_num_tiles *= m_tile_end[i];
       }
     }
@@ -325,6 +338,7 @@ struct ImplMDRangePolicy
       index_type span;
       for (int i=0; i<rank; ++i) {
         span = upper[i] - lower[i];
+        /*
         if ( m_tile[i] <= 0 ) {
           // TODO: determine what is a good default tile size for cuda
           // may be rank dependent
@@ -337,7 +351,9 @@ struct ImplMDRangePolicy
             m_tile[i] = 16;
           }
         }
-        m_tile_end[i] = static_cast<index_type>((span + m_tile[i] - 1) / m_tile[i]);
+        */
+        //m_tile_end[i] = static_cast<index_type>((span + m_tile[i] - 1) / m_tile[i]);
+        m_tile_end.set<i>( static_cast<index_type>((span + m_tile[i] -1) / m_tile[i]) );
         m_num_tiles *= m_tile_end[i];
       }
       index_type total_tile_size_check = 1;
@@ -351,38 +367,82 @@ struct ImplMDRangePolicy
       }
     }
     #endif
+  
   }
 
   begin_type m_lower;
-  end_type m_upper;
-  tile_type m_tile;
-  tile_type m_tile_end;
+  end_type   m_upper;
+  tile_type  m_tile;
+  index_type m_num_tiles;
+  //point_type m_tile_end;
+  tile_end_type m_tile_end;
   /*
   point_type m_lower;
   point_type m_upper;
   tile_type  m_tile;
-  point_type m_tile_end;
   */
-  index_type m_num_tiles;
 };
 
 // MDRangePolicy function - returns an ImplMDRangePolicy
+/*
+template <typename BeginType, typename EndType, typename TileType, typename Traits>
+constexpr 
+ImplMDRangePolicy<BeginType, EndType, TileType, Traits>
+MDRangePolicy(BeginType && begin, EndType && end, TileType && tile, Traits && traits)
+{
+  return ImplMDRangePolicy<BeginType, EndType, TileType, Traits> {std::forward<BeginType>(begin), std::forward<EndType>(end), std::forward<TileType>(tile)};
+}
+*/
 
 template <typename BeginType, typename EndType, typename TileType, typename Traits>
 constexpr 
-/*
-typename std::enable_if< ( std::is_same< typename BeginType::Tag, Impl::BeginTag>::value 
-                        && std::is_same< typename EndType::Tag, Impl::EndTag>::value 
-                        && std::is_same< typename TileType::Tag, Impl::TileTag>::value )
-                       , ImplMDRangePolicy<BeginType, EndType, TileType, Traits>
-                       >::type
-*/
 ImplMDRangePolicy<BeginType, EndType, TileType, Traits>
 MDRangePolicy(BeginType const& begin, EndType const& end, TileType const& tile, Traits const& traits)
 {
-  return ImplMDRangePolicy<BeginType, EndType, TileType, Traits> {begin, end, tile};
+  return ImplMDRangePolicy<BeginType, EndType, TileType, Traits> {begin, end, tile, traits};
 }
 
+template <typename EndType, typename Traits>
+constexpr
+typename std::enable_if< std::is_same< typename EndType::tag, Impl::EndTag>::value
+                       , ImplMDRangePolicy< Impl::ConstArray<int,EndType::rank, Impl::BeginTag>, EndType, Impl::ConstArray<int, EndType::rank, Impl::TileTag>, Traits>
+                       >::type
+MDRangePolicy(EndType const& end, Traits const& traits)
+{
+  using return_type = ImplMDRangePolicy< Impl::ConstArray<int,EndType::rank, Impl::BeginTag>, EndType, Impl::ConstArray<int, EndType::rank, Impl::TileTag>, Traits>;
+  using begin_type  = Impl::ConstArray<int, EndType::rank, Impl::BeginTag>;
+  using tile_type  = Impl::ConstArray<int, EndType::rank, Impl::TileTag>;
+  return return_type{ begin_type::fill(0), end, tile_type::fill(1), traits };
+}
+
+template <typename EndType, typename TileType, typename Traits>
+constexpr
+typename std::enable_if< (  std::is_same< typename EndType::tag, Impl::EndTag>::value
+                         && std::is_same< typename TileType::tag, Impl::TileTag>::value )
+                       , ImplMDRangePolicy< Impl::ConstArray<int,EndType::rank, Impl::BeginTag>, EndType, TileType, Traits>
+                       >::type
+MDRangePolicy(EndType const& end, TileType const& tile, Traits const& traits)
+{
+  using return_type = ImplMDRangePolicy< Impl::ConstArray<int,EndType::rank, Impl::BeginTag>, EndType, TileType, Traits>;
+  using array_type  = Impl::ConstArray<int, EndType::rank, Impl::BeginTag>;
+  return return_type{ array_type::fill(0), end, tile, traits };
+}
+
+template <typename BeginType, typename EndType, typename Traits>
+constexpr
+typename std::enable_if< (  std::is_same< typename BeginType::tag, Impl::BeginTag>::value
+                         && std::is_same< typename EndType::tag, Impl::EndTag>::value )
+                       , ImplMDRangePolicy< BeginType, EndType, Impl::ConstArray<int, EndType::rank, Impl::TileTag>, Traits>
+                       >::type
+MDRangePolicy(BeginType const& begin, EndType const& end, Traits const& traits)
+{
+  using return_type = ImplMDRangePolicy< BeginType, EndType, Impl::ConstArray<int, EndType::rank, Impl::TileTag>, Traits>;
+  using array_type  = Impl::ConstArray<int, EndType::rank, Impl::TileTag>;
+  return return_type{ begin, end, array_type::fill(1), traits };
+}
+
+
+//no traits passed in
 template <typename BeginType, typename EndType, typename TileType>
 constexpr 
 typename std::enable_if< ( std::is_same< typename BeginType::Tag, Impl::BeginTag>::value 
@@ -396,50 +456,6 @@ MDRangePolicy(BeginType const& begin, EndType const& end, TileType const& tile)
   return ImplMDRangePolicy<BeginType, EndType, TileType, traits_type> {begin, end, tile};
 }
 
-//template <typename EndType, typename... Traits>
-template <typename EndType, typename Traits>
-constexpr
-typename std::enable_if< std::is_same< typename EndType::tag, Impl::EndTag>::value
-                       , ImplMDRangePolicy< Impl::ConstArray<int,EndType::rank, Impl::BeginTag>, EndType, Impl::ConstArray<int, EndType::rank, Impl::TileTag>, Traits>
-                       >::type
-MDRangePolicy(EndType const& end, Traits const& traits)
-{
-  using return_type = ImplMDRangePolicy< Impl::ConstArray<int,EndType::rank, Impl::BeginTag>, EndType, Impl::ConstArray<int, EndType::rank, Impl::TileTag>, Traits>;
-  using begin_type  = Impl::ConstArray<int, EndType::rank, Impl::BeginTag>;
-  using tile_type  = Impl::ConstArray<int, EndType::rank, Impl::TileTag>;
-  return return_type{ begin_type::fill(0), end, tile_type::fill(1) };
-}
-
-//template <typename EndType, typename TileType, typename... Traits>
-template <typename EndType, typename TileType, typename Traits>
-constexpr
-typename std::enable_if< (  std::is_same< typename EndType::tag, Impl::EndTag>::value
-                         && std::is_same< typename TileType::tag, Impl::TileTag>::value )
-                       , ImplMDRangePolicy< Impl::ConstArray<int,EndType::rank, Impl::BeginTag>, EndType, TileType, Traits>
-                       >::type
-MDRangePolicy(EndType const& end, TileType const& tile, Traits const& traits)
-{
-  using return_type = ImplMDRangePolicy< Impl::ConstArray<int,EndType::rank, Impl::BeginTag>, EndType, TileType, Traits>;
-  using array_type  = Impl::ConstArray<int, EndType::rank, Impl::BeginTag>;
-  return return_type{ array_type::fill(0), end, tile };
-}
-
-
-//template <typename BeginType, typename EndType, typename... Traits>
-template <typename BeginType, typename EndType, typename Traits>
-constexpr
-typename std::enable_if< (  std::is_same< typename BeginType::tag, Impl::BeginTag>::value
-                         && std::is_same< typename EndType::tag, Impl::EndTag>::value )
-                       , ImplMDRangePolicy< BeginType, EndType, Impl::ConstArray<int, EndType::rank, Impl::TileTag>, Traits>
-                       >::type
-MDRangePolicy(BeginType const& begin, EndType const& end, Traits const& traits)
-{
-  using return_type = ImplMDRangePolicy< BeginType, EndType, Impl::ConstArray<int, EndType::rank, Impl::TileTag>, Traits>;
-  using array_type  = Impl::ConstArray<int, EndType::rank, Impl::TileTag>;
-  return return_type{ begin, end, array_type::fill(1) };
-}
-
-//no traits passed in
 template <typename BeginType, typename EndType, typename TileType>
 constexpr 
 ImplMDRangePolicy<BeginType, EndType, TileType, Kokkos::Impl::PolicyTraits<> >

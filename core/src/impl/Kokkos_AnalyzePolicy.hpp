@@ -191,7 +191,12 @@ struct PolicyTraits
   : public AnalyzePolicy< PolicyTraitsBase<>, Traits... >::type
 {};
 
-}} // namespace Kokkos::Impl
+} // namespace Impl
+
+template < typename ... Args >
+using MDRangePolicyTraits = Impl::PolicyTraits< Args ... >;
+
+} // namespace Kokkos
 
 
 #endif //KOKKOS_IMPL_ANALYZE_POLICY_HPP
