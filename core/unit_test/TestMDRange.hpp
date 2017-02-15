@@ -210,6 +210,48 @@ struct TestMDRange_2D {
 */
       //auto range = MDRangePolicy< ExecSpace, Rank<2>, Kokkos::IndexType<int> > ( Begin(0,0), End(N0,N1), Tile(3,3) );
       //auto range = Kokkos::Experimental::MDRangePolicy( Begin(0,0), End(N0,N1), Tile(3,3), Kokkos::Impl::PolicyTraits< ExecSpace, Rank<2>, Kokkos::IndexType<int> >{} );
+      auto range = MDRangePolicy( Begin(0,0), End(N0,N1), Tile(Kokkos::LayoutLeft{},3,3), Kokkos::MDRangePolicyTraits< ExecSpace, Rank<2>, Kokkos::IndexType<int> >{} );
+
+      TestMDRange_2D functor(N0,N1);
+
+      md_parallel_for( range, functor );
+
+      HostViewType h_view = Kokkos::create_mirror_view( functor.input_view );
+      Kokkos::deep_copy( h_view , functor.input_view );
+
+      int counter = 0;
+      for ( int i=0; i<N0; ++i ) {
+        for ( int j=0; j<N1; ++j ) {
+          if ( h_view(i,j) != 1 ) {
+            ++counter;
+          }
+        }}
+      if ( counter != 0 )
+        printf("Defaults + InitTag op(): Errors in test_for2; mismatches = %d\n\n",counter);
+      ASSERT_EQ( counter , 0 );
+    }
+    {
+      auto range = Kokkos::Experimental::MDRangePolicy( Begin(0,0), End(N0,N1), Tile(Kokkos::LayoutRight{},3,3), Kokkos::MDRangePolicyTraits< ExecSpace, Rank<2>, Kokkos::IndexType<int> >{} );
+
+      TestMDRange_2D functor(N0,N1);
+
+      md_parallel_for( range, functor );
+
+      HostViewType h_view = Kokkos::create_mirror_view( functor.input_view );
+      Kokkos::deep_copy( h_view , functor.input_view );
+
+      int counter = 0;
+      for ( int i=0; i<N0; ++i ) {
+        for ( int j=0; j<N1; ++j ) {
+          if ( h_view(i,j) != 1 ) {
+            ++counter;
+          }
+        }}
+      if ( counter != 0 )
+        printf("Defaults + InitTag op(): Errors in test_for2; mismatches = %d\n\n",counter);
+      ASSERT_EQ( counter , 0 );
+    }
+    {
       auto range = Kokkos::Experimental::MDRangePolicy( Begin(0,0), End(N0,N1), Tile(3,3), Kokkos::MDRangePolicyTraits< ExecSpace, Rank<2>, Kokkos::IndexType<int> >{} );
 
       TestMDRange_2D functor(N0,N1);
@@ -230,6 +272,183 @@ struct TestMDRange_2D {
         printf("Defaults + InitTag op(): Errors in test_for2; mismatches = %d\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
+    {
+      auto range = Kokkos::Experimental::MDRangePolicy( End(N0,N1), Tile(3,3), Kokkos::MDRangePolicyTraits< ExecSpace, Rank<2>, Kokkos::IndexType<int> >{} );
+
+      TestMDRange_2D functor(N0,N1);
+
+      md_parallel_for( range, functor );
+
+      HostViewType h_view = Kokkos::create_mirror_view( functor.input_view );
+      Kokkos::deep_copy( h_view , functor.input_view );
+
+      int counter = 0;
+      for ( int i=0; i<N0; ++i ) {
+        for ( int j=0; j<N1; ++j ) {
+          if ( h_view(i,j) != 1 ) {
+            ++counter;
+          }
+        }}
+      if ( counter != 0 )
+        printf("Defaults + InitTag op(): Errors in test_for2; mismatches = %d\n\n",counter);
+      ASSERT_EQ( counter , 0 );
+    }
+
+    {
+      auto range = Kokkos::Experimental::MDRangePolicy( End(N0,N1), Kokkos::Experimental::Impl::TileArray<int,2>(3,3), Kokkos::MDRangePolicyTraits< ExecSpace, Rank<2>, Kokkos::IndexType<int> >{} );
+
+      TestMDRange_2D functor(N0,N1);
+
+      md_parallel_for( range, functor );
+
+      HostViewType h_view = Kokkos::create_mirror_view( functor.input_view );
+      Kokkos::deep_copy( h_view , functor.input_view );
+
+      int counter = 0;
+      for ( int i=0; i<N0; ++i ) {
+        for ( int j=0; j<N1; ++j ) {
+          if ( h_view(i,j) != 1 ) {
+            ++counter;
+          }
+        }}
+      if ( counter != 0 )
+        printf("Defaults + InitTag op(): Errors in test_for2; mismatches = %d\n\n",counter);
+      ASSERT_EQ( counter , 0 );
+    }
+    {
+      auto range = Kokkos::Experimental::MDRangePolicy( End(N0,N1), Kokkos::MDRangePolicyTraits< ExecSpace, Rank<2>, Kokkos::IndexType<int> >{} );
+
+      TestMDRange_2D functor(N0,N1);
+
+      md_parallel_for( range, functor );
+
+      HostViewType h_view = Kokkos::create_mirror_view( functor.input_view );
+      Kokkos::deep_copy( h_view , functor.input_view );
+
+      int counter = 0;
+      for ( int i=0; i<N0; ++i ) {
+        for ( int j=0; j<N1; ++j ) {
+          if ( h_view(i,j) != 1 ) {
+            ++counter;
+          }
+        }}
+      if ( counter != 0 )
+        printf("Defaults + InitTag op(): Errors in test_for2; mismatches = %d\n\n",counter);
+      ASSERT_EQ( counter , 0 );
+    }
+
+    {
+      auto range = Kokkos::Experimental::MDRangePolicy( End(N0,N1) );
+
+      TestMDRange_2D functor(N0,N1);
+
+      md_parallel_for( range, functor );
+
+      HostViewType h_view = Kokkos::create_mirror_view( functor.input_view );
+      Kokkos::deep_copy( h_view , functor.input_view );
+
+      int counter = 0;
+      for ( int i=0; i<N0; ++i ) {
+        for ( int j=0; j<N1; ++j ) {
+          if ( h_view(i,j) != 1 ) {
+            ++counter;
+          }
+        }}
+      if ( counter != 0 )
+        printf("Defaults + InitTag op(): Errors in test_for2; mismatches = %d\n\n",counter);
+      ASSERT_EQ( counter , 0 );
+    }
+
+    {
+      auto range = Kokkos::Experimental::MDRangePolicy( Begin(0,0), End(N0,N1) );
+
+      TestMDRange_2D functor(N0,N1);
+
+      md_parallel_for( range, functor );
+
+      HostViewType h_view = Kokkos::create_mirror_view( functor.input_view );
+      Kokkos::deep_copy( h_view , functor.input_view );
+
+      int counter = 0;
+      for ( int i=0; i<N0; ++i ) {
+        for ( int j=0; j<N1; ++j ) {
+          if ( h_view(i,j) != 1 ) {
+            ++counter;
+          }
+        }}
+      if ( counter != 0 )
+        printf("Defaults + InitTag op(): Errors in test_for2; mismatches = %d\n\n",counter);
+      ASSERT_EQ( counter , 0 );
+    }
+
+    {
+      auto range = Kokkos::Experimental::MDRangePolicy( Begin(0,0), End(N0,N1), Tile(3,3) );
+
+      TestMDRange_2D functor(N0,N1);
+
+      md_parallel_for( range, functor );
+
+      HostViewType h_view = Kokkos::create_mirror_view( functor.input_view );
+      Kokkos::deep_copy( h_view , functor.input_view );
+
+      int counter = 0;
+      for ( int i=0; i<N0; ++i ) {
+        for ( int j=0; j<N1; ++j ) {
+          if ( h_view(i,j) != 1 ) {
+            ++counter;
+          }
+        }}
+      if ( counter != 0 )
+        printf("Defaults + InitTag op(): Errors in test_for2; mismatches = %d\n\n",counter);
+      ASSERT_EQ( counter , 0 );
+    }
+
+    {
+      auto range = Kokkos::Experimental::MDRangePolicy( Kokkos::LayoutRight{}, Begin(0,0), End(N0,N1), Tile(3,3) );
+
+      TestMDRange_2D functor(N0,N1);
+
+      md_parallel_for( range, functor );
+
+      HostViewType h_view = Kokkos::create_mirror_view( functor.input_view );
+      Kokkos::deep_copy( h_view , functor.input_view );
+
+      int counter = 0;
+      for ( int i=0; i<N0; ++i ) {
+        for ( int j=0; j<N1; ++j ) {
+          if ( h_view(i,j) != 1 ) {
+            ++counter;
+          }
+        }}
+      if ( counter != 0 )
+        printf("Defaults + InitTag op(): Errors in test_for2; mismatches = %d\n\n",counter);
+      ASSERT_EQ( counter , 0 );
+    }
+
+    // This one has ambiguous function call - cannot distinguish between tile,traits vs end,tile
+    /*
+    {
+      auto range = Kokkos::Experimental::MDRangePolicy( End(N0,N1), Kokkos::Experimental::Impl::TileArray<int,2>(3,3) );
+
+      TestMDRange_2D functor(N0,N1);
+
+      md_parallel_for( range, functor );
+
+      HostViewType h_view = Kokkos::create_mirror_view( functor.input_view );
+      Kokkos::deep_copy( h_view , functor.input_view );
+
+      int counter = 0;
+      for ( int i=0; i<N0; ++i ) {
+        for ( int j=0; j<N1; ++j ) {
+          if ( h_view(i,j) != 1 ) {
+            ++counter;
+          }
+        }}
+      if ( counter != 0 )
+        printf("Defaults + InitTag op(): Errors in test_for2; mismatches = %d\n\n",counter);
+      ASSERT_EQ( counter , 0 );
+    }
+    */
 
 /*
     {
