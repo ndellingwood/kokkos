@@ -59,7 +59,7 @@
 namespace Test {
 
 enum { NUMBER_OF_TRIALS = 5 };
-
+/*
 template< class DeviceType , class LayoutType >
 void run_test_mdrange( int exp_beg , int exp_end, const char deviceTypeName[], int range_offset = 0,  int tile_offset = 0 )
 // exp_beg = 6 => 2^6 = 64 is starting range length
@@ -351,7 +351,7 @@ void run_test_mdrange( int exp_beg , int exp_end, const char deviceTypeName[], i
 #undef MDRANGE_PERFORMANCE_OUTPUT_VERBOSE
 
 }
-
+*/
 
 template< class DeviceType >
 void run_test_hexgrad( int exp_beg , int exp_end, const char deviceTypeName[] )

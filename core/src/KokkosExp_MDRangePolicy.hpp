@@ -107,6 +107,14 @@ struct ConstArray
   constexpr Type operator[](int i) const
   { return m_values[i]; }
 
+  KOKKOS_INLINE_FUNCTION //NDE check if there is a KOKKOS_INLINE_CONSTEXPR, or test with different ordering
+  Type operator()(int i) const
+  { return m_values[i]; }
+
+//  KOKKOS_INLINE_FUNCTION
+//  Type get_cuda(int i) const
+//  { return m_values[i]; }
+
   template <typename... Values>
   constexpr ConstArray( Values &&... values )
     : m_values{ static_cast<Type>(values)... }
@@ -481,7 +489,7 @@ struct ImplMDRangePolicy
         }
         */
         //m_tile_end[i] = static_cast<index_type>((span + m_tile[i] - 1) / m_tile[i]);
-        m_tile_end.set<i>( static_cast<index_type>((span + m_tile[i] -1) / m_tile[i]) ); // runtime...
+        m_tile_end.set(i, static_cast<index_type>((span + m_tile[i] -1) / m_tile[i]) ); // runtime...
         m_num_tiles *= m_tile_end[i];
       }
       index_type total_tile_size_check = 1;
@@ -509,7 +517,7 @@ struct ImplMDRangePolicy
   point_type m_upper;
   tile_type  m_tile;
   */
-};
+}; //end ImplMDRangePolicy
 
 /*
 // MDRangePolicy function - returns an ImplMDRangePolicy; original test
@@ -527,7 +535,12 @@ MDRangePolicy(BeginType && begin, EndType && end, TileType && tile, Traits && tr
 // B,E,T,Tr
 template <typename OuterLayout, typename TB, typename TE, typename TT, unsigned R, typename Traits, typename InnerLayout>
 constexpr 
-ImplMDRangePolicy<OuterLayout, Kokkos::Experimental::Impl::BeginArray<TB,R>, Kokkos::Experimental::Impl::EndArray<TE,R>, Kokkos::Experimental::Impl::TileArray<TT,R,InnerLayout>, Traits>
+ImplMDRangePolicy<OuterLayout, 
+  Kokkos::Experimental::Impl::BeginArray<TB,R>, 
+  Kokkos::Experimental::Impl::EndArray<TE,R>, 
+  Kokkos::Experimental::Impl::TileArray<TT,R,InnerLayout>, 
+  Traits
+  >
 MDRangePolicy( OuterLayout const& layout, Kokkos::Experimental::Impl::BeginArray<TB,R> const& begin, Kokkos::Experimental::Impl::EndArray<TE,R> const& end, Kokkos::Experimental::Impl::TileArray<TT,R,InnerLayout> const& tile, Traits const& traits)
 {
   using LayoutType = OuterLayout;
@@ -541,7 +554,12 @@ MDRangePolicy( OuterLayout const& layout, Kokkos::Experimental::Impl::BeginArray
 // E,T,Tr
 template <typename OuterLayout, typename TE, typename TT, unsigned R, typename Traits, typename InnerLayout>
 constexpr 
-ImplMDRangePolicy<OuterLayout, Kokkos::Experimental::Impl::BeginArray<TE,R>, Kokkos::Experimental::Impl::EndArray<TE,R>, Kokkos::Experimental::Impl::TileArray<TT,R,InnerLayout>, Traits>
+ImplMDRangePolicy<OuterLayout, 
+  Kokkos::Experimental::Impl::BeginArray<TE,R>, 
+  Kokkos::Experimental::Impl::EndArray<TE,R>, 
+  Kokkos::Experimental::Impl::TileArray<TT,R,InnerLayout>, 
+  Traits
+  >
 MDRangePolicy(OuterLayout const& layout,  Kokkos::Experimental::Impl::EndArray<TE,R> const& end, Kokkos::Experimental::Impl::TileArray<TT,R,InnerLayout> const& tile, Traits const& traits)
 {
   using LayoutType = OuterLayout;
@@ -555,7 +573,12 @@ MDRangePolicy(OuterLayout const& layout,  Kokkos::Experimental::Impl::EndArray<T
 // E,Tr
 template <typename OuterLayout, typename TE, unsigned R, typename Traits >
 constexpr 
-ImplMDRangePolicy<OuterLayout, Kokkos::Experimental::Impl::BeginArray<TE,R>, Kokkos::Experimental::Impl::EndArray<TE,R>, Kokkos::Experimental::Impl::TileArray<TE,R,void>, Traits>
+ImplMDRangePolicy<OuterLayout, 
+  Kokkos::Experimental::Impl::BeginArray<TE,R>, 
+  Kokkos::Experimental::Impl::EndArray<TE,R>, 
+  Kokkos::Experimental::Impl::TileArray<TE,R,void>, 
+  Traits
+  >
 MDRangePolicy(OuterLayout const& layout,  Kokkos::Experimental::Impl::EndArray<TE,R> const& end, Traits const& traits)
 {
   using LayoutType = OuterLayout;
@@ -569,7 +592,12 @@ MDRangePolicy(OuterLayout const& layout,  Kokkos::Experimental::Impl::EndArray<T
 // B,E,Tr
 template <typename OuterLayout, typename TB, typename TE, unsigned R, typename Traits>
 constexpr 
-ImplMDRangePolicy<OuterLayout, Kokkos::Experimental::Impl::BeginArray<TB,R>, Kokkos::Experimental::Impl::EndArray<TE,R>, Kokkos::Experimental::Impl::TileArray<TE,R,void>, Traits>
+ImplMDRangePolicy<OuterLayout, 
+  Kokkos::Experimental::Impl::BeginArray<TB,R>, 
+  Kokkos::Experimental::Impl::EndArray<TE,R>, 
+  Kokkos::Experimental::Impl::TileArray<TE,R,void>, 
+  Traits
+  >
 MDRangePolicy(OuterLayout const& layout,  Kokkos::Experimental::Impl::BeginArray<TB,R> const& begin, Kokkos::Experimental::Impl::EndArray<TE,R> const& end, Traits const& traits)
 {
   using LayoutType = OuterLayout;
@@ -585,7 +613,12 @@ MDRangePolicy(OuterLayout const& layout,  Kokkos::Experimental::Impl::BeginArray
 // B,E,T
 template <typename OuterLayout, typename TB, typename TE, typename TT, unsigned R, typename InnerLayout>
 constexpr 
-ImplMDRangePolicy<OuterLayout, Kokkos::Experimental::Impl::BeginArray<TB,R>, Kokkos::Experimental::Impl::EndArray<TE,R>, Kokkos::Experimental::Impl::TileArray<TT,R,InnerLayout>, Kokkos::MDRangePolicyTraits<> >
+ImplMDRangePolicy<OuterLayout, 
+  Kokkos::Experimental::Impl::BeginArray<TB,R>, 
+  Kokkos::Experimental::Impl::EndArray<TE,R>, 
+  Kokkos::Experimental::Impl::TileArray<TT,R,InnerLayout>, 
+  Kokkos::MDRangePolicyTraits<Kokkos::IndexType<TE> > 
+  >
 MDRangePolicy(OuterLayout const& layout,  Kokkos::Experimental::Impl::BeginArray<TB,R> const& begin, Kokkos::Experimental::Impl::EndArray<TE,R> const& end, Kokkos::Experimental::Impl::TileArray<TT,R,InnerLayout> const& tile )
 {
   using LayoutType = OuterLayout;
@@ -593,7 +626,7 @@ MDRangePolicy(OuterLayout const& layout,  Kokkos::Experimental::Impl::BeginArray
   using EndType = Kokkos::Experimental::Impl::EndArray<TE,R>; 
   using TileType = Kokkos::Experimental::Impl::TileArray<TT,R,InnerLayout>; 
 //  using Traits = Kokkos::Impl::PolicyTraits<> ;
-  using Traits = Kokkos::MDRangePolicyTraits<> ;
+  using Traits = Kokkos::MDRangePolicyTraits<Kokkos::IndexType<TE> > ;
   return ImplMDRangePolicy<LayoutType, BeginType, EndType, TileType, Traits> {begin, end, tile };
 }
 
@@ -601,7 +634,12 @@ MDRangePolicy(OuterLayout const& layout,  Kokkos::Experimental::Impl::BeginArray
 // E,T
 template <typename OuterLayout, typename TE, typename TT, unsigned R, typename InnerLayout>
 constexpr 
-ImplMDRangePolicy<OuterLayout, Kokkos::Experimental::Impl::BeginArray<TE,R>, Kokkos::Experimental::Impl::EndArray<TE,R>, Kokkos::Experimental::Impl::TileArray<TT,R,InnerLayout>, Kokkos::MDRangePolicyTraits<> >
+ImplMDRangePolicy<OuterLayout, 
+  Kokkos::Experimental::Impl::BeginArray<TE,R>, 
+  Kokkos::Experimental::Impl::EndArray<TE,R>, 
+  Kokkos::Experimental::Impl::TileArray<TT,R,InnerLayout>, 
+  Kokkos::MDRangePolicyTraits<Kokkos::IndexType<TE> > 
+  >
 MDRangePolicy(OuterLayout const& layout,  Kokkos::Experimental::Impl::EndArray<TE,R> const& end, Kokkos::Experimental::Impl::TileArray<TT,R,InnerLayout> const& tile )
 {
   using LayoutType = OuterLayout;
@@ -609,14 +647,19 @@ MDRangePolicy(OuterLayout const& layout,  Kokkos::Experimental::Impl::EndArray<T
   using EndType = Kokkos::Experimental::Impl::EndArray<TE,R>; 
   using TileType = Kokkos::Experimental::Impl::TileArray<TT,R,InnerLayout>; 
 //  using Traits = Kokkos::Impl::PolicyTraits<> ;
-  using Traits = Kokkos::MDRangePolicyTraits<> ;
+  using Traits = Kokkos::MDRangePolicyTraits<Kokkos::IndexType<TE> > ;
   return ImplMDRangePolicy<LayoutType, BeginType, EndType, TileType, Traits> {BeginType::fill(0), end, tile };
 }
 
 // E
 template <typename OuterLayout, typename TE, unsigned R>
 constexpr 
-ImplMDRangePolicy<OuterLayout, Kokkos::Experimental::Impl::BeginArray<TE,R>, Kokkos::Experimental::Impl::EndArray<TE,R>, Kokkos::Experimental::Impl::TileArray<TE,R,void>, Kokkos::MDRangePolicyTraits<> >
+ImplMDRangePolicy<OuterLayout, 
+  Kokkos::Experimental::Impl::BeginArray<TE,R>, 
+  Kokkos::Experimental::Impl::EndArray<TE,R>, 
+  Kokkos::Experimental::Impl::TileArray<TE,R,void>, 
+  Kokkos::MDRangePolicyTraits<Kokkos::IndexType<TE> > 
+  >
 MDRangePolicy(OuterLayout const& layout,  Kokkos::Experimental::Impl::EndArray<TE,R> const& end )
 {
   using LayoutType = OuterLayout;
@@ -624,7 +667,7 @@ MDRangePolicy(OuterLayout const& layout,  Kokkos::Experimental::Impl::EndArray<T
   using EndType = Kokkos::Experimental::Impl::EndArray<TE,R>; 
   using TileType = Kokkos::Experimental::Impl::TileArray<TE,R,void>; 
 //  using Traits = Kokkos::Impl::PolicyTraits<> ;
-  using Traits = Kokkos::MDRangePolicyTraits<> ;
+  using Traits = Kokkos::MDRangePolicyTraits<Kokkos::IndexType<TE>> ;
   return ImplMDRangePolicy<LayoutType, BeginType, EndType, TileType, Traits> {BeginType::fill(0), end, TileType::fill(1)};
 }
 
@@ -632,7 +675,12 @@ MDRangePolicy(OuterLayout const& layout,  Kokkos::Experimental::Impl::EndArray<T
 // B,E
 template <typename OuterLayout, typename TB, typename TE, unsigned R>
 constexpr 
-ImplMDRangePolicy<OuterLayout, Kokkos::Experimental::Impl::BeginArray<TB,R>, Kokkos::Experimental::Impl::EndArray<TE,R>, Kokkos::Experimental::Impl::TileArray<TE,R,void>, Kokkos::MDRangePolicyTraits<> >
+ImplMDRangePolicy<OuterLayout, 
+  Kokkos::Experimental::Impl::BeginArray<TB,R>, 
+  Kokkos::Experimental::Impl::EndArray<TE,R>, 
+  Kokkos::Experimental::Impl::TileArray<TE,R,void>, 
+  Kokkos::MDRangePolicyTraits<Kokkos::IndexType<TE>> 
+  >
 MDRangePolicy(OuterLayout const& layout,  Kokkos::Experimental::Impl::BeginArray<TB,R> const& begin, Kokkos::Experimental::Impl::EndArray<TE,R> const& end )
 {
   using LayoutType = OuterLayout;
@@ -640,11 +688,9 @@ MDRangePolicy(OuterLayout const& layout,  Kokkos::Experimental::Impl::BeginArray
   using EndType = Kokkos::Experimental::Impl::EndArray<TE,R>; 
   using TileType = Kokkos::Experimental::Impl::TileArray<TE,R,void>; 
 //  using Traits = Kokkos::Impl::PolicyTraits<> ;
-  using Traits = Kokkos::MDRangePolicyTraits<> ;
+  using Traits = Kokkos::MDRangePolicyTraits<Kokkos::IndexType<TE>> ;
   return ImplMDRangePolicy<LayoutType, BeginType, EndType, TileType, Traits> {begin, end, TileType::fill(1)};
 }
-
-
 
 
 
@@ -652,7 +698,12 @@ MDRangePolicy(OuterLayout const& layout,  Kokkos::Experimental::Impl::BeginArray
 // B,E,T,Tr
 template <typename TB, typename TE, typename TT, unsigned R, typename Traits, typename InnerLayout>
 constexpr 
-ImplMDRangePolicy<typename Traits::execution_space::array_layout, Kokkos::Experimental::Impl::BeginArray<TB,R>, Kokkos::Experimental::Impl::EndArray<TE,R>, Kokkos::Experimental::Impl::TileArray<TT,R,InnerLayout>, Traits>
+ImplMDRangePolicy<typename Traits::execution_space::array_layout, 
+  Kokkos::Experimental::Impl::BeginArray<TB,R>, 
+  Kokkos::Experimental::Impl::EndArray<TE,R>, 
+  Kokkos::Experimental::Impl::TileArray<TT,R,InnerLayout>, 
+  Traits
+  >
 MDRangePolicy( Kokkos::Experimental::Impl::BeginArray<TB,R> const& begin, Kokkos::Experimental::Impl::EndArray<TE,R> const& end, Kokkos::Experimental::Impl::TileArray<TT,R,InnerLayout> const& tile, Traits const& traits)
 {
   using LayoutType = typename Traits::execution_space::array_layout;
@@ -666,7 +717,12 @@ MDRangePolicy( Kokkos::Experimental::Impl::BeginArray<TB,R> const& begin, Kokkos
 // E,T,Tr
 template <typename TE, typename TT, unsigned R, typename Traits, typename InnerLayout>
 constexpr 
-ImplMDRangePolicy<typename Traits::execution_space::array_layout, Kokkos::Experimental::Impl::BeginArray<TE,R>, Kokkos::Experimental::Impl::EndArray<TE,R>, Kokkos::Experimental::Impl::TileArray<TT,R,InnerLayout>, Traits>
+ImplMDRangePolicy<typename Traits::execution_space::array_layout, 
+  Kokkos::Experimental::Impl::BeginArray<TE,R>, 
+  Kokkos::Experimental::Impl::EndArray<TE,R>, 
+  Kokkos::Experimental::Impl::TileArray<TT,R,InnerLayout>, 
+  Traits
+  >
 MDRangePolicy( Kokkos::Experimental::Impl::EndArray<TE,R> const& end, Kokkos::Experimental::Impl::TileArray<TT,R,InnerLayout> const& tile, Traits const& traits)
 {
   using LayoutType = typename Traits::execution_space::array_layout;
@@ -680,7 +736,12 @@ MDRangePolicy( Kokkos::Experimental::Impl::EndArray<TE,R> const& end, Kokkos::Ex
 // E,Tr
 template <typename TE, unsigned R, typename Traits >
 constexpr 
-ImplMDRangePolicy<typename Traits::execution_space::array_layout, Kokkos::Experimental::Impl::BeginArray<TE,R>, Kokkos::Experimental::Impl::EndArray<TE,R>, Kokkos::Experimental::Impl::TileArray<TE,R,void>, Traits>
+ImplMDRangePolicy<typename Traits::execution_space::array_layout, 
+  Kokkos::Experimental::Impl::BeginArray<TE,R>, 
+  Kokkos::Experimental::Impl::EndArray<TE,R>, 
+  Kokkos::Experimental::Impl::TileArray<TE,R,void>, 
+  Traits
+  >
 MDRangePolicy( Kokkos::Experimental::Impl::EndArray<TE,R> const& end, Traits const& traits)
 {
   using LayoutType = typename Traits::execution_space::array_layout;
@@ -694,7 +755,12 @@ MDRangePolicy( Kokkos::Experimental::Impl::EndArray<TE,R> const& end, Traits con
 // B,E,Tr
 template <typename TB, typename TE, unsigned R, typename Traits>
 constexpr 
-ImplMDRangePolicy<typename Traits::execution_space::array_layout, Kokkos::Experimental::Impl::BeginArray<TB,R>, Kokkos::Experimental::Impl::EndArray<TE,R>, Kokkos::Experimental::Impl::TileArray<TE,R,void>, Traits>
+ImplMDRangePolicy<typename Traits::execution_space::array_layout, 
+  Kokkos::Experimental::Impl::BeginArray<TB,R>, 
+  Kokkos::Experimental::Impl::EndArray<TE,R>, 
+  Kokkos::Experimental::Impl::TileArray<TE,R,void>, 
+  Traits
+  >
 MDRangePolicy( Kokkos::Experimental::Impl::BeginArray<TB,R> const& begin, Kokkos::Experimental::Impl::EndArray<TE,R> const& end, Traits const& traits)
 {
   using LayoutType = typename Traits::execution_space::array_layout;
@@ -710,14 +776,21 @@ MDRangePolicy( Kokkos::Experimental::Impl::BeginArray<TB,R> const& begin, Kokkos
 // B,E,T
 template <typename TB, typename TE, typename TT, unsigned R, typename InnerLayout>
 constexpr 
-ImplMDRangePolicy<Kokkos::MDRangePolicyTraits<>::execution_space::array_layout, Kokkos::Experimental::Impl::BeginArray<TB,R>, Kokkos::Experimental::Impl::EndArray<TE,R>, Kokkos::Experimental::Impl::TileArray<TT,R,InnerLayout>, Kokkos::MDRangePolicyTraits<> >
+ImplMDRangePolicy<
+//  typename Kokkos::Impl::PolicyTraits<>::array_layout,  //Issue with this line with Cuda - possibly frailty in the compiler??? 'incomplete type' error; passing IndexType explicitly corrects the error
+  typename Kokkos::Impl::PolicyTraits<Kokkos::IndexType<TE>>::execution_space::array_layout, 
+  Kokkos::Experimental::Impl::BeginArray<TB,R>, 
+  Kokkos::Experimental::Impl::EndArray<TE,R>, 
+  Kokkos::Experimental::Impl::TileArray<TT,R,InnerLayout>, 
+  Kokkos::MDRangePolicyTraits<Kokkos::IndexType<TE>> 
+  >
 MDRangePolicy( Kokkos::Experimental::Impl::BeginArray<TB,R> const& begin, Kokkos::Experimental::Impl::EndArray<TE,R> const& end, Kokkos::Experimental::Impl::TileArray<TT,R,InnerLayout> const& tile )
 {
   using BeginType = Kokkos::Experimental::Impl::BeginArray<TB,R>; 
   using EndType = Kokkos::Experimental::Impl::EndArray<TE,R>; 
   using TileType = Kokkos::Experimental::Impl::TileArray<TT,R,InnerLayout>; 
-//  using Traits = Kokkos::Impl::PolicyTraits<> ;
-  using Traits = Kokkos::MDRangePolicyTraits<> ;
+  using Traits = Kokkos::Impl::PolicyTraits<Kokkos::IndexType<TE>> ;
+//  using Traits = Kokkos::MDRangePolicyTraits<> ;
   using LayoutType = typename Traits::execution_space::array_layout;
   return ImplMDRangePolicy<LayoutType, BeginType, EndType, TileType, Traits> {begin, end, tile };
 }
@@ -726,15 +799,21 @@ MDRangePolicy( Kokkos::Experimental::Impl::BeginArray<TB,R> const& begin, Kokkos
 // E,T
 template <typename TE, typename TT, unsigned R, typename InnerLayout>
 constexpr 
-ImplMDRangePolicy<Kokkos::MDRangePolicyTraits<>::execution_space::array_layout, Kokkos::Experimental::Impl::BeginArray<TE,R>, Kokkos::Experimental::Impl::EndArray<TE,R>, Kokkos::Experimental::Impl::TileArray<TT,R,InnerLayout>, Kokkos::MDRangePolicyTraits<> >
+ImplMDRangePolicy<
+  //typename Kokkos::Impl::PolicyTraits<>::array_layout, 
+  typename Kokkos::Impl::PolicyTraits<Kokkos::IndexType<TE>>::execution_space::array_layout, 
+  Kokkos::Experimental::Impl::BeginArray<TE,R>, 
+  Kokkos::Experimental::Impl::EndArray<TE,R>, 
+  Kokkos::Experimental::Impl::TileArray<TT,R,InnerLayout>, 
+  Kokkos::MDRangePolicyTraits<Kokkos::IndexType<TE>> 
+  >
 MDRangePolicy( Kokkos::Experimental::Impl::EndArray<TE,R> const& end, Kokkos::Experimental::Impl::TileArray<TT,R,InnerLayout> const& tile )
 {
-
   using BeginType = Kokkos::Experimental::Impl::BeginArray<TE,R>; 
   using EndType = Kokkos::Experimental::Impl::EndArray<TE,R>; 
   using TileType = Kokkos::Experimental::Impl::TileArray<TT,R,InnerLayout>; 
-//  using Traits = Kokkos::Impl::PolicyTraits<> ;
-  using Traits = Kokkos::MDRangePolicyTraits<> ;
+  using Traits = Kokkos::Impl::PolicyTraits<Kokkos::IndexType<TE>> ;
+//  using Traits = Kokkos::MDRangePolicyTraits<> ;
   using LayoutType = typename Traits::execution_space::array_layout;
   return ImplMDRangePolicy<LayoutType, BeginType, EndType, TileType, Traits> {BeginType::fill(0), end, tile };
 }
@@ -742,15 +821,22 @@ MDRangePolicy( Kokkos::Experimental::Impl::EndArray<TE,R> const& end, Kokkos::Ex
 // E
 template <typename TE, unsigned R>
 constexpr 
-ImplMDRangePolicy<Kokkos::MDRangePolicyTraits<>::execution_space::array_layout, Kokkos::Experimental::Impl::BeginArray<TE,R>, Kokkos::Experimental::Impl::EndArray<TE,R>, Kokkos::Experimental::Impl::TileArray<TE,R,void>, Kokkos::MDRangePolicyTraits<> >
+ImplMDRangePolicy<
+  //typename Kokkos::Impl::PolicyTraits<>::array_layout, 
+  typename Kokkos::Impl::PolicyTraits<Kokkos::IndexType<TE>>::execution_space::array_layout, 
+  Kokkos::Experimental::Impl::BeginArray<TE,R>, 
+  Kokkos::Experimental::Impl::EndArray<TE,R>, 
+  Kokkos::Experimental::Impl::TileArray<TE,R,void>, 
+  Kokkos::MDRangePolicyTraits<Kokkos::IndexType<TE>> 
+  >
 MDRangePolicy( Kokkos::Experimental::Impl::EndArray<TE,R> const& end )
 {
 
   using BeginType = Kokkos::Experimental::Impl::BeginArray<TE,R>; 
   using EndType = Kokkos::Experimental::Impl::EndArray<TE,R>; 
   using TileType = Kokkos::Experimental::Impl::TileArray<TE,R,void>; 
-//  using Traits = Kokkos::Impl::PolicyTraits<> ;
-  using Traits = Kokkos::MDRangePolicyTraits<> ;
+  using Traits = Kokkos::Impl::PolicyTraits<Kokkos::IndexType<TE>> ;
+//  using Traits = Kokkos::MDRangePolicyTraits<> ;
   using LayoutType = typename Traits::execution_space::array_layout;
   return ImplMDRangePolicy<LayoutType, BeginType, EndType, TileType, Traits> {BeginType::fill(0), end, TileType::fill(1)};
 }
@@ -759,14 +845,21 @@ MDRangePolicy( Kokkos::Experimental::Impl::EndArray<TE,R> const& end )
 // B,E
 template <typename TB, typename TE, unsigned R>
 constexpr 
-ImplMDRangePolicy<Kokkos::MDRangePolicyTraits<>::execution_space::array_layout, Kokkos::Experimental::Impl::BeginArray<TB,R>, Kokkos::Experimental::Impl::EndArray<TE,R>, Kokkos::Experimental::Impl::TileArray<TE,R,void>, Kokkos::MDRangePolicyTraits<> >
+ImplMDRangePolicy<
+  //typename Kokkos::Impl::PolicyTraits<>::array_layout, 
+  typename Kokkos::Impl::PolicyTraits<Kokkos::IndexType<TE>>::execution_space::array_layout, 
+  Kokkos::Experimental::Impl::BeginArray<TB,R>, 
+  Kokkos::Experimental::Impl::EndArray<TE,R>, 
+  Kokkos::Experimental::Impl::TileArray<TE,R,void>, 
+  Kokkos::MDRangePolicyTraits<Kokkos::IndexType<TE>> 
+  >
 MDRangePolicy( Kokkos::Experimental::Impl::BeginArray<TB,R> const& begin, Kokkos::Experimental::Impl::EndArray<TE,R> const& end )
 {
   using BeginType = Kokkos::Experimental::Impl::BeginArray<TB,R>; 
   using EndType = Kokkos::Experimental::Impl::EndArray<TE,R>; 
   using TileType = Kokkos::Experimental::Impl::TileArray<TE,R,void>; 
-//  using Traits = Kokkos::Impl::PolicyTraits<> ;
-  using Traits = Kokkos::MDRangePolicyTraits<> ;
+  using Traits = Kokkos::Impl::PolicyTraits<Kokkos::IndexType<TE>> ;
+//  using Traits = Kokkos::MDRangePolicyTraits<> ;
   using LayoutType = typename Traits::execution_space::array_layout;
   return ImplMDRangePolicy<LayoutType, BeginType, EndType, TileType, Traits> {begin, end, TileType::fill(1)};
 }

@@ -48,6 +48,7 @@ template< class DeviceType
         >
 struct MultiDimRangePerf3D
 {
+  /*
   typedef DeviceType execution_space;
   typedef typename execution_space::size_type  size_type;
 
@@ -228,7 +229,7 @@ struct MultiDimRangePerf3D
 
     return dt_min;
   } 
-
+*/
 };
 
 
@@ -238,6 +239,7 @@ template< class DeviceType
         >
 struct MultiDimRangePerf3D_Collapse
 {
+  /*
   // 3D Range, but will collapse only 2 dims => Rank<2> for multi-dim; unroll 2 dims in one-dim
 
   typedef DeviceType execution_space;
@@ -410,7 +412,7 @@ struct MultiDimRangePerf3D_Collapse
 
     return dt_min;
   } 
-
+*/
 };
 
 template< class DeviceType 
@@ -419,6 +421,7 @@ template< class DeviceType
         >
 struct MultiDimRangePerf3D_CollapseAll
 {
+  /*
   // 3D Range, but will collapse only 2 dims => Rank<2> for multi-dim; unroll 2 dims in one-dim
 
   typedef DeviceType execution_space;
@@ -581,7 +584,7 @@ struct MultiDimRangePerf3D_CollapseAll
 
     return dt_min;
   } 
-
+*/
 };
 
 } //end namespace Test

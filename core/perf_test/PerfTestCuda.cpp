@@ -73,7 +73,7 @@ class cuda : public ::testing::Test {
       Kokkos::HostSpace::execution_space::finalize();
     }
 };
-
+/*
 TEST_F( cuda, mdrange_lr ) {
   EXPECT_NO_THROW( (run_test_mdrange<Kokkos::Cuda , Kokkos::LayoutRight>( 5, 10, "Kokkos::Cuda" )) );
 }
@@ -81,7 +81,7 @@ TEST_F( cuda, mdrange_lr ) {
 TEST_F( cuda, mdrange_ll ) {
   EXPECT_NO_THROW( (run_test_mdrange<Kokkos::Cuda , Kokkos::LayoutLeft>( 5, 10, "Kokkos::Cuda" )) );
 }
-
+*/
 TEST_F( cuda, hexgrad )
 {
   EXPECT_NO_THROW( run_test_hexgrad< Kokkos::Cuda >( 10 , 20, "Kokkos::Cuda" ) );
