@@ -70,11 +70,11 @@ namespace Kokkos { namespace Experimental { namespace Impl {
 // ------------------------------------------------------------------ //
 
 template < typename T1, typename T2 >
-//typename std::common_type<T1,T2>::type min_mixed_types( T1 a, T2 b ) {
-auto min_mixed_types( T1 a, T2 b ) -> typename std::common_type<T1,T2>::type 
+//typename std::common_type<T1,T2>::type min_mixed_int_types( T1 a, T2 b ) {
+auto min_mixed_int_types( T1 a, T2 b ) -> typename std::common_type<T1,T2>::type 
 { 
-  static_assert( std::is_integral<T1>::value, "Kokkos min_mixed_types assert failed: Input a is not integral type" );
-  static_assert( std::is_integral<T2>::value, "Kokkos min_mixed_types assert failed: Input b is not integral type" );
+  static_assert( std::is_integral<T1>::value, "Kokkos min_mixed_int_types assert failed: Input a is not integral type" );
+  static_assert( std::is_integral<T2>::value, "Kokkos min_mixed_int_types assert failed: Input b is not integral type" );
 
   using c_type = typename std::common_type<T1,T2>::type;
   if ( static_cast<c_type>(a) < static_cast<c_type>(b) ) {
@@ -405,7 +405,7 @@ struct apply_impl<4,RP,Functor,void >
     if (RP::inner_direction == RP::Left) {
       const index_type temp0  =  ( m_rp.m_upper(0) - m_rp.m_lower(0) + m_rp.m_tile(0) - 1 ) / m_rp.m_tile(0) ;
       const index_type temp1  =  ( m_rp.m_upper(1) - m_rp.m_lower(1) + m_rp.m_tile(1) - 1 ) / m_rp.m_tile(1) ;
-      const index_type numbl0 = ( temp0 <= max_blocks ? temp0 : max_blocks ) ;
+      const index_type numbl0 = ( temp0 <= max_blocks ? temp0 : max_blocks ) ; // this check insufficient...
       const index_type numbl1 = ( temp1 <= max_blocks ? temp1 : max_blocks ) ;
 
       const index_type tile_id0 = blockIdx.x % numbl0;
@@ -757,11 +757,11 @@ struct apply_impl<5,RP,Functor,Tag>
         const index_type offset_4 = tile_id4*m_rp.m_tile(4) + threadIdx.z;
         if ( offset_4 < m_rp.m_upper(4) && threadIdx.z < m_rp.m_tile(4) ) {
 
-          for ( index_type l = tile_id3; l < m_rp.m_tile_end(3); l += thr_id3 ) { 
+          for ( index_type l = tile_id3; l < m_rp.m_tile_end(3); l += numbl3 ) { 
             const index_type offset_3 = l*m_rp.m_tile(3) + thr_id3;
             if ( offset_3 < m_rp.m_upper(3) && thr_id3 < m_rp.m_tile(3) ) {
 
-              for ( index_type k = tile_id2; k < m_rp.m_tile_end(2); k += thr_id2 ) { 
+              for ( index_type k = tile_id2; k < m_rp.m_tile_end(2); k += numbl2 ) { 
                 const index_type offset_2 = k*m_rp.m_tile(2) + thr_id2;
                 if ( offset_2 < m_rp.m_upper(2) && thr_id2 < m_rp.m_tile(2) ) {
 
@@ -814,11 +814,11 @@ struct apply_impl<5,RP,Functor,Tag>
             const index_type offset_1 = j*m_rp.m_tile(1) + thr_id1;
             if ( offset_1 < m_rp.m_upper(1) && thr_id1 < m_rp.m_tile(1) ) {
 
-              for ( index_type k = tile_id2; k < m_rp.m_tile_end(2); k += thr_id2 ) { 
+              for ( index_type k = tile_id2; k < m_rp.m_tile_end(2); k += numbl2 ) { 
                 const index_type offset_2 = k*m_rp.m_tile(2) + thr_id2;
                 if ( offset_2 < m_rp.m_upper(2) && thr_id2 < m_rp.m_tile(2) ) {
 
-                  for ( index_type l = tile_id3; l < m_rp.m_tile_end(3); l += gridDim.z ) { 
+                  for ( index_type l = tile_id3; l < m_rp.m_tile_end(3); l += numbl3 ) { 
                     const index_type offset_3 = l*m_rp.m_tile(3) + thr_id3;
                     if ( offset_3 < m_rp.m_upper(3) && thr_id3 < m_rp.m_tile(3) ) {
 
@@ -1181,8 +1181,6 @@ template < typename RP
 struct DeviceIterateTile
 {
   using index_type = typename RP::index_type;
-  using array_index_type = typename RP::array_index_type;
-  using point_type = typename RP::point_type;
 
   struct VoidDummy {};
   typedef typename std::conditional< std::is_same<Tag, void>::value, VoidDummy, Tag>::type usable_tag;
@@ -1213,12 +1211,15 @@ public:
   {
     //pad numthreads for mult of 2^p
 
-    const array_index_type maxblocks = 65535; //not true for newer archs
+    //using array_index_type = typename RP::array_index_type;
+    //const array_index_type maxblocks = 65535; //not true for newer archs
+    const unsigned maxblocks = 65535; //not true for newer archs, need to be retrieved
+
     if ( RP::rank == 2 )
     {
       const dim3 block( m_rp.m_tile(0) , m_rp.m_tile(1) , 1); 
       //const dim3 grid( std::min( ( m_rp.m_upper[0] - m_rp.m_lower[0] + block.x - 1 ) / block.x , maxblocks ) , std::min( ( m_rp.m_upper[1] - m_rp.m_lower[1] + block.y - 1 ) / block.y , maxblocks ) , 1);
-      const dim3 grid( min_mixed_types( ( m_rp.m_upper(0) - m_rp.m_lower(0) + block.x - 1 ) / block.x , maxblocks ) , min_mixed_types( ( m_rp.m_upper(1) - m_rp.m_lower(1) + block.y - 1 ) / block.y , maxblocks ) , 1);
+      const dim3 grid( min_mixed_int_types( ( m_rp.m_upper(0) - m_rp.m_lower(0) + block.x - 1 ) / block.x , maxblocks ) , min_mixed_int_types( ( m_rp.m_upper(1) - m_rp.m_lower(1) + block.y - 1 ) / block.y , maxblocks ) , 1);
       // error  KokkosExp_Cuda_IterateTile.hpp(1205): error: no instance of overloaded function "std::min" matches the argument list
       CudaLaunch< DeviceIterateTile >( *this , grid , block );
     }
@@ -1226,9 +1227,9 @@ public:
     {
       const dim3 block( m_rp.m_tile(0) , m_rp.m_tile(1) , m_rp.m_tile(2) ); 
       const dim3 grid( 
-          min_mixed_types( ( m_rp.m_upper(0) - m_rp.m_lower(0) + block.x - 1 ) / block.x , maxblocks ) 
-        , min_mixed_types( ( m_rp.m_upper(1) - m_rp.m_lower(1) + block.y - 1 ) / block.y , maxblocks ) 
-        , min_mixed_types( ( m_rp.m_upper(2) - m_rp.m_lower(2) + block.z - 1 ) / block.z , maxblocks ) 
+          min_mixed_int_types( ( m_rp.m_upper(0) - m_rp.m_lower(0) + block.x - 1 ) / block.x , maxblocks ) 
+        , min_mixed_int_types( ( m_rp.m_upper(1) - m_rp.m_lower(1) + block.y - 1 ) / block.y , maxblocks ) 
+        , min_mixed_int_types( ( m_rp.m_upper(2) - m_rp.m_lower(2) + block.z - 1 ) / block.z , maxblocks ) 
         );
 
       CudaLaunch< DeviceIterateTile >( *this , grid , block );
@@ -1238,44 +1239,53 @@ public:
       // id0,id1 encoded within threadIdx.x; id2 to threadIdx.y; id3 to threadIdx.z
       const dim3 block( m_rp.m_tile(0)*m_rp.m_tile(1) , m_rp.m_tile(2) , m_rp.m_tile(3) ); 
       const dim3 grid( 
-          min_mixed_types( ( static_cast<index_type>(( m_rp.m_upper(0) - m_rp.m_lower(0) + m_rp.m_tile(0) - 1 ) / m_rp.m_tile(0) 
+          min_mixed_int_types( ( static_cast<index_type>(( m_rp.m_upper(0) - m_rp.m_lower(0) + m_rp.m_tile(0) - 1 ) / m_rp.m_tile(0) 
                     *  ( m_rp.m_upper(1) - m_rp.m_lower(1) + m_rp.m_tile(1) - 1 ) / m_rp.m_tile(1) ))
                   , static_cast<index_type>(maxblocks) ) 
-        , min_mixed_types( ( m_rp.m_upper(2) - m_rp.m_lower(2) + block.y - 1 ) / block.y , maxblocks ) 
-        , min_mixed_types( ( m_rp.m_upper(3) - m_rp.m_lower(3) + block.z - 1 ) / block.z , maxblocks ) 
+        , min_mixed_int_types( ( m_rp.m_upper(2) - m_rp.m_lower(2) + block.y - 1 ) / block.y , maxblocks ) 
+        , min_mixed_int_types( ( m_rp.m_upper(3) - m_rp.m_lower(3) + block.z - 1 ) / block.z , maxblocks ) 
         );
+      //std::cout << "  grid:  " << grid.x << "," << grid.y << "," << grid.z << std::endl;
+      //std::cout << "  block: " << block.x << "," << block.y << "," << block.z << std::endl;
+
       CudaLaunch< DeviceIterateTile >( *this , grid , block );
     }
     else if ( RP::rank == 5 )
     {
-      // id0,id1 encoded within threadIdx.x; id2 to threadIdx.y; id3 to threadIdx.z
+      // id0,id1 encoded within threadIdx.x; id2,id3 to threadIdx.y; id4 to threadIdx.z
       const dim3 block( m_rp.m_tile(0)*m_rp.m_tile(1) , m_rp.m_tile(2)*m_rp.m_tile(3) , m_rp.m_tile(4) ); 
       const dim3 grid( 
-          min_mixed_types( static_cast<index_type>(( ( m_rp.m_upper(0) - m_rp.m_lower(0) + m_rp.m_tile(0) - 1 ) / m_rp.m_tile(0) 
+          min_mixed_int_types( static_cast<index_type>(( ( m_rp.m_upper(0) - m_rp.m_lower(0) + m_rp.m_tile(0) - 1 ) / m_rp.m_tile(0) 
                    *  ( m_rp.m_upper(1) - m_rp.m_lower(1) + m_rp.m_tile(1) - 1 ) / m_rp.m_tile(1) ))
                   , static_cast<index_type>(maxblocks) ) 
-        , min_mixed_types( static_cast<index_type>(( ( m_rp.m_upper(2) - m_rp.m_lower(2) + m_rp.m_tile(2) - 1 ) / m_rp.m_tile(2) 
+        , min_mixed_int_types( static_cast<index_type>(( ( m_rp.m_upper(2) - m_rp.m_lower(2) + m_rp.m_tile(2) - 1 ) / m_rp.m_tile(2) 
                    *  ( m_rp.m_upper(3) - m_rp.m_lower(3) + m_rp.m_tile(3) - 1 ) / m_rp.m_tile(3) ))
                   , static_cast<index_type>(maxblocks) ) 
-        , min_mixed_types( ( m_rp.m_upper(4) - m_rp.m_lower(4) + block.z - 1 ) / block.z , maxblocks ) 
+        , min_mixed_int_types( ( m_rp.m_upper(4) - m_rp.m_lower(4) + block.z - 1 ) / block.z , maxblocks ) 
         );
+      //std::cout << "  grid:  " << grid.x << "," << grid.y << "," << grid.z << std::endl;
+      //std::cout << "  block: " << block.x << "," << block.y << "," << block.z << std::endl;
+
       CudaLaunch< DeviceIterateTile >( *this , grid , block );
     }
     else if ( RP::rank == 6 )
     {
-      // id0,id1 encoded within threadIdx.x; id2 to threadIdx.y; id3 to threadIdx.z
+      // id0,id1 encoded within threadIdx.x; id2,id3 to threadIdx.y; id4,id5 to threadIdx.z
       const dim3 block( m_rp.m_tile(0)*m_rp.m_tile(1) , m_rp.m_tile(2)*m_rp.m_tile(3) , m_rp.m_tile(4)*m_rp.m_tile(5) );
       const dim3 grid( 
-          min_mixed_types( static_cast<index_type>(( ( m_rp.m_upper(0) - m_rp.m_lower(0) + m_rp.m_tile(0) - 1 ) / m_rp.m_tile(0) 
+          min_mixed_int_types( static_cast<index_type>(( ( m_rp.m_upper(0) - m_rp.m_lower(0) + m_rp.m_tile(0) - 1 ) / m_rp.m_tile(0) 
                    *  ( m_rp.m_upper(1) - m_rp.m_lower(1) + m_rp.m_tile(1) - 1 ) / m_rp.m_tile(1) ))
                   , static_cast<index_type>(maxblocks) ) 
-        , min_mixed_types( static_cast<index_type>(( ( m_rp.m_upper(2) - m_rp.m_lower(2) + m_rp.m_tile(2) - 1 ) / m_rp.m_tile(2) 
+        , min_mixed_int_types( static_cast<index_type>(( ( m_rp.m_upper(2) - m_rp.m_lower(2) + m_rp.m_tile(2) - 1 ) / m_rp.m_tile(2) 
                    *  ( m_rp.m_upper(3) - m_rp.m_lower(3) + m_rp.m_tile(3) - 1 ) / m_rp.m_tile(3) ))
                   , static_cast<index_type>(maxblocks) ) 
-        , min_mixed_types( static_cast<index_type>(( ( m_rp.m_upper(4) - m_rp.m_lower(4) + m_rp.m_tile(4) - 1 ) / m_rp.m_tile(4) 
+        , min_mixed_int_types( static_cast<index_type>(( ( m_rp.m_upper(4) - m_rp.m_lower(4) + m_rp.m_tile(4) - 1 ) / m_rp.m_tile(4) 
                    *  ( m_rp.m_upper(5) - m_rp.m_lower(5) + m_rp.m_tile(5) - 1 ) / m_rp.m_tile(5) ))
                   , static_cast<index_type>(maxblocks) ) 
         );
+      //std::cout << "  grid:  " << grid.x << "," << grid.y << "," << grid.z << std::endl;
+      //std::cout << "  block: " << block.x << "," << block.y << "," << block.z << std::endl;
+
       CudaLaunch< DeviceIterateTile >( *this , grid , block );
     }
     else

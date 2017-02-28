@@ -160,26 +160,6 @@ struct TileArray : public ConstArray<T, Rank>
   {}
 };
 
-// are_integrals - unused; common_index_type took over this functionality and combined with common_type and remove_cv
-/*
-template <typename... Args>
-struct are_integrals;
-
-template <typename Arg, typename... Args>
-struct are_integrals<Arg, Args...>
-  : public std::integral_constant<bool, (std::is_integral<Arg>::value && are_integrals<Args...>::value) >
-{};
-
-template <typename Arg>
-struct are_integrals<Arg>
-  : public std::is_integral<Arg>
-{};
-
-template <>
-struct are_integrals<>
-  : public std::false_type
-{};
-*/
 
 template < typename ... Args >
 struct common_index_type {
@@ -286,7 +266,6 @@ auto Tile( Arg0 && arg0, Args &&... args ) -> typename std::conditional< is_mdra
 }
 */
 
-
 template <typename Arg0, typename... Args, typename = typename std::enable_if<is_mdrange_layout<Arg0>::value>::type >
 inline constexpr
 auto Tile( Arg0 && arg0, Args &&... args ) -> Impl::TileArray< typename std::common_type<Args...>::type, sizeof...(Args), Arg0 >
@@ -301,6 +280,16 @@ auto Tile( Arg0 && arg0, Args &&... args ) -> Impl::TileArray< typename std::com
 {
   using result_type = Impl::TileArray< typename std::common_type<Arg0,Args...>::type, sizeof...(Args)+1u, void >;
   return result_type(std::forward<Arg0>(arg0), std::forward<Args>(args)...);
+}
+
+// Traits
+template <typename... Args>
+inline constexpr
+auto TraitsFcn( Args &&... args ) -> Kokkos::Impl::PolicyTraits< Args... >
+{
+  using result_type = Kokkos::Impl::PolicyTraits< Args... >;
+  //return result_type(std::forward<Args>(args)...);
+  return result_type();
 }
 
 
@@ -327,7 +316,8 @@ struct default_inner_direction
 
 
 // Iteration Pattern
-// Plan to remove this altogether...
+// NDE: Need to remove this or modify the need for it
+// Could it still have use, for example if num args > rank and would like the extra args ignored??
 template < unsigned N
          , Iterate OuterDir = Iterate::Default
          , Iterate InnerDir = Iterate::Default
@@ -353,9 +343,6 @@ template <typename OuterLayout, typename Begin, typename End, typename Tile, typ
 struct ImplMDRangePolicy
   : public Traits
 {
-//  static_assert( std::is_same< typename Begin::tag, Impl::BeginTag>::value, "ImplMDRangePolicy Error: Not a Begin" );
-//  static_assert( std::is_same< typename End::tag, Impl::EndTag>::value,     "ImplMDRangePolicy Error: Not a End" );
-//  static_assert( std::is_same< typename Tile::tag, Impl::TileTag>::value,   "ImplMDRangePolicy Error: Not a Tile" );
 
   using traits = Traits; //Kokkos::Impl::PolicyTraits<Properties ...>;
   using range_policy = RangePolicy< typename traits::execution_space
@@ -372,31 +359,18 @@ struct ImplMDRangePolicy
 
 //  static_assert( !std::is_same<typename traits::iteration_pattern,void>::value
 //               , "Kokkos Error: MD iteration pattern not defined" );
-
 //  using iteration_pattern   = typename traits::iteration_pattern;
+
   using work_tag            = typename traits::work_tag;
 
   static_assert( ( (Begin::rank) == (End::rank) )  , "ImplMDRangePolicy Error: Begin, End, and Tile ranks are not equal" ); //NDE - what is issue? rank is a static member...
   static_assert( ( (Begin::rank) == (Tile::rank) ) , "ImplMDRangePolicy Error: Begin, End, and Tile ranks are not equal" );
   static constexpr int rank = Begin::rank;
   //static constexpr int rank = iteration_pattern::rank;
-/*
-  static constexpr int outer_direction = static_cast<int> (
-      (iteration_pattern::outer_direction != Iterate::Default)
-    ? iteration_pattern::outer_direction
-    : default_outer_direction< typename traits::execution_space>::value );
-
-  static constexpr int inner_direction = static_cast<int> (
-      iteration_pattern::inner_direction != Iterate::Default
-    ? iteration_pattern::inner_direction
-    : default_inner_direction< typename traits::execution_space>::value ) ;
-
-*/
 
   using begin_type  = Begin;
   using end_type    = End;
   using tile_type   = Tile;
-
 
   static constexpr int inner_direction = static_cast<int> (
     ( std::is_same<typename tile_type::layout,Kokkos::LayoutLeft>::value)
@@ -421,9 +395,10 @@ struct ImplMDRangePolicy
 
   using tile_end_type  = Tile;
   using index_type  = typename traits::index_type;
-  using array_index_type = long; //get rid of this once refactored
+  using array_index_type = long; //get rid of this once refactored - needed for Host_IterateTile
   using point_type  = Kokkos::Array<array_index_type,rank>; //was index_type; still used in Host_IterateTile and Cuda_IterateTile
 //  using tile_type   = Kokkos::Array<array_index_type,rank>;
+//
   // If point_type or tile_type is not templated on a signed integral type (if it is unsigned), 
   // then if user passes in intializer_list of runtime-determined values of 
   // signed integral type that are not const will receive a compiler error due 
@@ -451,18 +426,20 @@ struct ImplMDRangePolicy
       index_type span;
       for (int i=0; i<rank; ++i) {
         span = upper[i] - lower[i];
-        /*
+
         if ( m_tile[i] <= 0 ) {
           if (  (inner_direction == Right && (i < rank-1))
               || (inner_direction == Left && (i > 0)) )
           {
-            m_tile[i] = 2;
+            //m_tile[i] = 2;
+            m_tile.set( i, static_cast<index_type>(2) );
           }
           else {
-            m_tile[i] = span;
+            //m_tile[i] = span;
+            m_tile.set( i, static_cast<index_type>(span) );
           }
         }
-        */
+
         //m_tile_end[i] = static_cast<index_type>((span + m_tile[i] -1) / m_tile[i]);
         m_tile_end.set(i, static_cast<index_type>((span + m_tile[i] -1) / m_tile[i]) ); // runtime...
         m_num_tiles *= m_tile_end[i];
@@ -474,20 +451,22 @@ struct ImplMDRangePolicy
       index_type span;
       for (int i=0; i<rank; ++i) {
         span = upper[i] - lower[i];
-        /*
+
         if ( m_tile[i] <= 0 ) {
           // TODO: determine what is a good default tile size for cuda
           // may be rank dependent
           if (  (inner_direction == Right && (i < rank-1))
               || (inner_direction == Left && (i > 0)) )
           {
-            m_tile[i] = 2;
+            //m_tile[i] = 2;
+            m_tile.set( i, static_cast<index_type>(2) );
           }
           else {
-            m_tile[i] = 16;
+            //m_tile[i] = 16;
+            m_tile.set( i, static_cast<index_type>(16) );
           }
         }
-        */
+
         //m_tile_end[i] = static_cast<index_type>((span + m_tile[i] - 1) / m_tile[i]);
         m_tile_end.set(i, static_cast<index_type>((span + m_tile[i] -1) / m_tile[i]) ); // runtime...
         m_num_tiles *= m_tile_end[i];
@@ -496,6 +475,14 @@ struct ImplMDRangePolicy
       for (int i=0; i<rank; ++i) {
         total_tile_size_check *= m_tile[i];
       }
+
+      /*
+      std::cout << "  Cuda: total_tile_size is " << total_tile_size_check << std::endl;
+      for (int i=0; i<rank; ++i) {
+        std::cout << "  tile dims_"<< i << "  " <<  m_tile[i] << std::endl;
+      }
+      */
+
       if ( total_tile_size_check > 1024 ) {
         printf(" Tile dimensions exceed Cuda limits\n");
         Kokkos::abort(" Cuda ExecSpace Error: MDRange tile dims exceed maximum number of threads per block - choose smaller tile dims");
@@ -712,6 +699,8 @@ MDRangePolicy( Kokkos::Experimental::Impl::BeginArray<TB,R> const& begin, Kokkos
   using TileType = Kokkos::Experimental::Impl::TileArray<TT,R,InnerLayout>;
   return ImplMDRangePolicy<LayoutType, BeginType, EndType, TileType, Traits> {begin, end, tile };
 }
+// End Traits Function
+
 
 //template <typename T, unsigned R, typename Traits>
 // E,T,Tr
@@ -823,19 +812,18 @@ template <typename TE, unsigned R>
 constexpr 
 ImplMDRangePolicy<
   //typename Kokkos::Impl::PolicyTraits<>::array_layout, 
-  typename Kokkos::Impl::PolicyTraits<Kokkos::IndexType<TE>>::execution_space::array_layout, 
+  typename Kokkos::Impl::PolicyTraits< Kokkos::IndexType<TE> >::execution_space::array_layout, 
   Kokkos::Experimental::Impl::BeginArray<TE,R>, 
   Kokkos::Experimental::Impl::EndArray<TE,R>, 
   Kokkos::Experimental::Impl::TileArray<TE,R,void>, 
-  Kokkos::MDRangePolicyTraits<Kokkos::IndexType<TE>> 
+  Kokkos::MDRangePolicyTraits< Kokkos::IndexType<TE> > 
   >
 MDRangePolicy( Kokkos::Experimental::Impl::EndArray<TE,R> const& end )
 {
-
   using BeginType = Kokkos::Experimental::Impl::BeginArray<TE,R>; 
   using EndType = Kokkos::Experimental::Impl::EndArray<TE,R>; 
   using TileType = Kokkos::Experimental::Impl::TileArray<TE,R,void>; 
-  using Traits = Kokkos::Impl::PolicyTraits<Kokkos::IndexType<TE>> ;
+  using Traits = Kokkos::Impl::PolicyTraits< Kokkos::IndexType<TE> >;
 //  using Traits = Kokkos::MDRangePolicyTraits<> ;
   using LayoutType = typename Traits::execution_space::array_layout;
   return ImplMDRangePolicy<LayoutType, BeginType, EndType, TileType, Traits> {BeginType::fill(0), end, TileType::fill(1)};
