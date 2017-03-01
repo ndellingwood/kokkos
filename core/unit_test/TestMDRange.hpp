@@ -220,7 +220,7 @@ struct TestMDRange_2D {
           }
         }}
       if ( counter != 0 )
-        printf("- , LL, TraitsFcn, InitTag op(): Errors in test_for2; mismatches = %d\n\n",counter);
+        printf("- , LL, TraitsFcn, InitTag op(): Errors in test_for2; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
     {
@@ -243,7 +243,7 @@ struct TestMDRange_2D {
           }
         }}
       if ( counter != 0 )
-        printf("- , LL, TraitsFcn, InitTag op(): Errors in test_for2; mismatches = %d\n\n",counter);
+        printf("- , LL, TraitsFcn, InitTag op(): Errors in test_for2; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
     {
@@ -266,7 +266,7 @@ struct TestMDRange_2D {
           }
         }}
       if ( counter != 0 )
-        printf("- , LL, TraitsFcn, InitTag op(): Errors in test_for2; mismatches = %d\n\n",counter);
+        printf("- , LL, TraitsFcn, InitTag op(): Errors in test_for2; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
     {
@@ -287,7 +287,7 @@ struct TestMDRange_2D {
           }
         }}
       if ( counter != 0 )
-        printf("- , LL, TraitsFcn: Errors in test_for2; mismatches = %d\n\n",counter);
+        printf("- , LL, TraitsFcn: Errors in test_for2; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
 
@@ -310,7 +310,7 @@ struct TestMDRange_2D {
           }
         }}
       if ( counter != 0 )
-        printf("LR, LL, InitTag op(): Errors in test_for2; mismatches = %d\n\n",counter);
+        printf("LR, LL, InitTag op(): Errors in test_for2; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
     {
@@ -331,7 +331,7 @@ struct TestMDRange_2D {
           }
         }}
       if ( counter != 0 )
-        printf("LL, LL, InitTag op(): Errors in test_for2; mismatches = %d\n\n",counter);
+        printf("LL, LL, InitTag op(): Errors in test_for2; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
     {
@@ -352,7 +352,7 @@ struct TestMDRange_2D {
           }
         }}
       if ( counter != 0 )
-        printf("LR, LR, InitTag op(): Errors in test_for2; mismatches = %d\n\n",counter);
+        printf("LR, LR, InitTag op(): Errors in test_for2; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
     {
@@ -373,7 +373,7 @@ struct TestMDRange_2D {
           }
         }}
       if ( counter != 0 )
-        printf("LL, LR, InitTag op(): Errors in test_for2; mismatches = %d\n\n",counter);
+        printf("LL, LR, InitTag op(): Errors in test_for2; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
     {
@@ -394,7 +394,7 @@ struct TestMDRange_2D {
           }
         }}
       if ( counter != 0 )
-        printf("LR, - , InitTag op(): Errors in test_for2; mismatches = %d\n\n",counter);
+        printf("LR, - , InitTag op(): Errors in test_for2; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
 
@@ -425,7 +425,7 @@ struct TestMDRange_2D {
           }
         }}
       if ( counter != 0 )
-        printf("- , LL, InitTag op(): Errors in test_for2; mismatches = %d\n\n",counter);
+        printf("- , LL, InitTag op(): Errors in test_for2; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
     {
@@ -446,7 +446,7 @@ struct TestMDRange_2D {
           }
         }}
       if ( counter != 0 )
-        printf("- , LR, InitTag op(): Errors in test_for2; mismatches = %d\n\n",counter);
+        printf("- , LR, InitTag op(): Errors in test_for2; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
     {
@@ -467,7 +467,7 @@ struct TestMDRange_2D {
           }
         }}
       if ( counter != 0 )
-        printf("DefaultL + InitTag op(): Errors in test_for2; mismatches = %d\n\n",counter);
+        printf("DefaultL + InitTag op(): Errors in test_for2; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
     {
@@ -488,7 +488,7 @@ struct TestMDRange_2D {
           }
         }}
       if ( counter != 0 )
-        printf("DefaultL, No Begin: Errors in test_for2; mismatches = %d\n\n",counter);
+        printf("DefaultL, No Begin: Errors in test_for2; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
 
@@ -510,7 +510,7 @@ struct TestMDRange_2D {
           }
         }}
       if ( counter != 0 )
-        printf("DefaultL, No Begin, Impl::TileArray: Errors in test_for2; mismatches = %d\n\n",counter);
+        printf("DefaultL, No Begin, Impl::TileArray: Errors in test_for2; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
     {
@@ -531,7 +531,7 @@ struct TestMDRange_2D {
           }
         }}
       if ( counter != 0 )
-        printf("DefaultL, No Begin, No Tile: Errors in test_for2; mismatches = %d\n\n",counter);
+        printf("DefaultL, No Begin, No Tile: Errors in test_for2; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
 
@@ -558,7 +558,7 @@ struct TestMDRange_2D {
           }
         }}
       if ( counter != 0 )
-        printf("DefaultL, No Begin, No Tile, No Traits: Errors in test_for2; mismatches = %d\n\n",counter);
+        printf("DefaultL, No Begin, No Tile, No Traits: Errors in test_for2; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
 
@@ -581,7 +581,7 @@ struct TestMDRange_2D {
           }
         }}
       if ( counter != 0 )
-        printf("DefaultL, No Tile, No Traits: Errors in test_for2; mismatches = %d\n\n",counter);
+        printf("DefaultL, No Tile, No Traits: Errors in test_for2; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
 
@@ -604,7 +604,7 @@ struct TestMDRange_2D {
           }
         }}
       if ( counter != 0 )
-        printf("Defaults: Errors in test_for2; mismatches = %d\n\n",counter); //failed
+        printf("Defaults: Errors in test_for2; mismatches = %ld\n\n",counter); //failed
       ASSERT_EQ( counter , 0 );
     }
 
@@ -627,7 +627,7 @@ struct TestMDRange_2D {
           }
         }}
       if ( counter != 0 )
-        printf("LR, - , No Traits: Errors in test_for2; mismatches = %d\n\n",counter);
+        printf("LR, - , No Traits: Errors in test_for2; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
     if ( std::is_same<Kokkos::DefaultExecutionSpace, ExecSpace>::value ) 
@@ -649,7 +649,7 @@ struct TestMDRange_2D {
           }
         }}
       if ( counter != 0 )
-        printf("LR, LR, No Traits: Errors in test_for2; mismatches = %d\n\n",counter);
+        printf("LR, LR, No Traits: Errors in test_for2; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
 
@@ -673,7 +673,7 @@ struct TestMDRange_2D {
           }
         }}
       if ( counter != 0 )
-        printf("Defaults + InitTag op(): Errors in test_for2; mismatches = %d\n\n",counter);
+        printf("Defaults + InitTag op(): Errors in test_for2; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
     */
@@ -700,7 +700,7 @@ struct TestMDRange_2D {
           }
         }}
       if ( counter != 0 )
-        printf("No info: Errors in test_for2; mismatches = %d\n\n",counter);
+        printf("No info: Errors in test_for2; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
 
@@ -725,7 +725,7 @@ struct TestMDRange_2D {
           }
         }}
       if ( counter != 0 )
-        printf("D D: Errors in test_for2; mismatches = %d\n\n",counter);
+        printf("D D: Errors in test_for2; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
 
@@ -750,7 +750,7 @@ struct TestMDRange_2D {
           }
         }}
       if ( counter != 0 )
-        printf("L L: Errors in test_for2; mismatches = %d\n\n",counter);
+        printf("L L: Errors in test_for2; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
 
@@ -775,7 +775,7 @@ struct TestMDRange_2D {
           }
         }}
       if ( counter != 0 )
-        printf("L R: Errors in test_for2; mismatches = %d\n\n",counter);
+        printf("L R: Errors in test_for2; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
 
@@ -800,7 +800,7 @@ struct TestMDRange_2D {
           }
         }}
       if ( counter != 0 )
-        printf("R L: Errors in test_for2; mismatches = %d\n\n",counter);
+        printf("R L: Errors in test_for2; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
 
@@ -825,7 +825,7 @@ struct TestMDRange_2D {
           }
         }}
       if ( counter != 0 )
-        printf("R R: Errors in test_for2; mismatches = %d\n\n",counter);
+        printf("R R: Errors in test_for2; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
 */
@@ -1007,7 +1007,7 @@ struct TestMDRange_3D {
           }
         }}
       if ( counter != 0 )
-        printf("Defaults + InitTag op(): Errors in test_for3; mismatches = %d\n\n",counter);
+        printf("Defaults + InitTag op(): Errors in test_for3; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
       std::cout << " 3dTest passed" << std::endl;
     }
@@ -1031,7 +1031,7 @@ struct TestMDRange_3D {
           }
         }}
       if ( counter != 0 )
-        printf("Defaults: Errors in test_for3; mismatches = %d\n\n",counter);
+        printf("Defaults: Errors in test_for3; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
       std::cout << " 3dTest passed" << std::endl;
     }
@@ -1060,7 +1060,7 @@ struct TestMDRange_3D {
           }
         }}}
       if ( counter != 0 )
-        printf(" Errors in test_for3; mismatches = %d\n\n",counter);
+        printf(" Errors in test_for3; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
 
@@ -1086,7 +1086,7 @@ struct TestMDRange_3D {
           }
         }}}
       if ( counter != 0 )
-        printf(" Errors in test_for3; mismatches = %d\n\n",counter);
+        printf(" Errors in test_for3; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
 
@@ -1112,7 +1112,7 @@ struct TestMDRange_3D {
           }
         }}}
       if ( counter != 0 )
-        printf(" Errors in test_for3; mismatches = %d\n\n",counter);
+        printf(" Errors in test_for3; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
 
@@ -1138,7 +1138,7 @@ struct TestMDRange_3D {
           }
         }}}
       if ( counter != 0 )
-        printf(" Errors in test_for3; mismatches = %d\n\n",counter);
+        printf(" Errors in test_for3; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
 
@@ -1164,7 +1164,7 @@ struct TestMDRange_3D {
           }
         }}}
       if ( counter != 0 )
-        printf(" Errors in test_for3; mismatches = %d\n\n",counter);
+        printf(" Errors in test_for3; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
 
@@ -1190,7 +1190,7 @@ struct TestMDRange_3D {
           }
         }}}
       if ( counter != 0 )
-        printf(" Errors in test_for3; mismatches = %d\n\n",counter);
+        printf(" Errors in test_for3; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
     */
@@ -1257,7 +1257,7 @@ struct TestMDRange_4D {
           }
         }}
       if ( counter != 0 )
-        printf("Defaults + InitTag op(): Errors in test_for4; mismatches = %d\n\n",counter);
+        printf("Defaults + InitTag op(): Errors in test_for4; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
       std::cout << " 4dTest passed" << std::endl;
     }
@@ -1283,7 +1283,7 @@ struct TestMDRange_4D {
           }
         }}
       if ( counter != 0 )
-        printf("Defaults: Errors in test_for4; mismatches = %d\n\n",counter);
+        printf("Defaults: Errors in test_for4; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
       std::cout << " 4dTest passed" << std::endl;
     }
@@ -1312,7 +1312,7 @@ struct TestMDRange_4D {
           }
         }}}}
       if ( counter != 0 )
-        printf(" Errors in test_for4; mismatches = %d\n\n",counter);
+        printf(" Errors in test_for4; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
 
@@ -1340,7 +1340,7 @@ struct TestMDRange_4D {
           }
         }}}}
       if ( counter != 0 )
-        printf(" Errors in test_for4; mismatches = %d\n\n",counter);
+        printf(" Errors in test_for4; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
 
@@ -1368,7 +1368,7 @@ struct TestMDRange_4D {
           }
         }}}}
       if ( counter != 0 )
-        printf(" Errors in test_for4; mismatches = %d\n\n",counter);
+        printf(" Errors in test_for4; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
 
@@ -1396,7 +1396,7 @@ struct TestMDRange_4D {
           }
         }}}}
       if ( counter != 0 )
-        printf(" Errors in test_for4; mismatches = %d\n\n",counter);
+        printf(" Errors in test_for4; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
 
@@ -1424,7 +1424,7 @@ struct TestMDRange_4D {
           }
         }}}}
       if ( counter != 0 )
-        printf(" Errors in test_for4; mismatches = %d\n\n",counter);
+        printf(" Errors in test_for4; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
 
@@ -1452,7 +1452,7 @@ struct TestMDRange_4D {
           }
         }}}}
       if ( counter != 0 )
-        printf(" Errors in test_for4; mismatches = %d\n\n",counter);
+        printf(" Errors in test_for4; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
 */
@@ -1519,7 +1519,7 @@ struct TestMDRange_5D {
           }
         }}
       if ( counter != 0 )
-        printf("Defaults + InitTag op(): Errors in test_for5; mismatches = %d\n\n",counter);
+        printf("Defaults + InitTag op(): Errors in test_for5; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
       std::cout << " 5dTest passed" << std::endl;
     }
@@ -1547,7 +1547,7 @@ struct TestMDRange_5D {
           }
         }}
       if ( counter != 0 )
-        printf("Defaults: Errors in test_for5; mismatches = %d\n\n",counter);
+        printf("Defaults: Errors in test_for5; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
       std::cout << " 5dTest passed" << std::endl;
     }
@@ -1577,7 +1577,7 @@ struct TestMDRange_5D {
               }
       }}}}}
       if ( counter != 0 )
-        printf(" Errors in test_for5; mismatches = %d\n\n",counter);
+        printf(" Errors in test_for5; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
 
@@ -1606,7 +1606,7 @@ struct TestMDRange_5D {
               }
       }}}}}
       if ( counter != 0 )
-        printf(" Errors in test_for5; mismatches = %d\n\n",counter);
+        printf(" Errors in test_for5; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
 
@@ -1635,7 +1635,7 @@ struct TestMDRange_5D {
               }
       }}}}}
       if ( counter != 0 )
-        printf(" Errors in test_for5; mismatches = %d\n\n",counter);
+        printf(" Errors in test_for5; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
 
@@ -1664,7 +1664,7 @@ struct TestMDRange_5D {
               }
       }}}}}
       if ( counter != 0 )
-        printf(" Errors in test_for5; mismatches = %d\n\n",counter);
+        printf(" Errors in test_for5; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
 
@@ -1693,7 +1693,7 @@ struct TestMDRange_5D {
               }
       }}}}}
       if ( counter != 0 )
-        printf(" Errors in test_for5; mismatches = %d\n\n",counter);
+        printf(" Errors in test_for5; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
 
@@ -1722,7 +1722,7 @@ struct TestMDRange_5D {
               }
       }}}}}
       if ( counter != 0 )
-        printf(" Errors in test_for5; mismatches = %d\n\n",counter);
+        printf(" Errors in test_for5; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
 */
@@ -1791,7 +1791,7 @@ struct TestMDRange_6D {
           }
         }}
       if ( counter != 0 )
-        printf("Defaults + InitTag op(): Errors in test_for6; mismatches = %d\n\n",counter);
+        printf("Defaults + InitTag op(): Errors in test_for6; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
       std::cout << " 6dTest passed" << std::endl;
     }
@@ -1821,7 +1821,7 @@ struct TestMDRange_6D {
           }
         }}
       if ( counter != 0 )
-        printf("Defaults: Errors in test_for6; mismatches = %d\n\n",counter);
+        printf("Defaults: Errors in test_for6; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
       std::cout << " 6dTest passed" << std::endl;
     }
@@ -1852,7 +1852,7 @@ struct TestMDRange_6D {
                 }
       }}}}}}
       if ( counter != 0 )
-        printf(" Errors in test_for6; mismatches = %d\n\n",counter);
+        printf(" Errors in test_for6; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
 
@@ -1882,7 +1882,7 @@ struct TestMDRange_6D {
                 }
       }}}}}}
       if ( counter != 0 )
-        printf(" Errors in test_for6; mismatches = %d\n\n",counter);
+        printf(" Errors in test_for6; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
 
@@ -1912,7 +1912,7 @@ struct TestMDRange_6D {
                 }
       }}}}}}
       if ( counter != 0 )
-        printf(" Errors in test_for6; mismatches = %d\n\n",counter);
+        printf(" Errors in test_for6; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
 
@@ -1942,7 +1942,7 @@ struct TestMDRange_6D {
                 }
       }}}}}}
       if ( counter != 0 )
-        printf(" Errors in test_for6; mismatches = %d\n\n",counter);
+        printf(" Errors in test_for6; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
 
@@ -1972,7 +1972,7 @@ struct TestMDRange_6D {
                 }
       }}}}}}
       if ( counter != 0 )
-        printf(" Errors in test_for6; mismatches = %d\n\n",counter);
+        printf(" Errors in test_for6; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
 
@@ -2002,7 +2002,7 @@ struct TestMDRange_6D {
                 }
       }}}}}}
       if ( counter != 0 )
-        printf(" Errors in test_for6; mismatches = %d\n\n",counter);
+        printf(" Errors in test_for6; mismatches = %ld\n\n",counter);
       ASSERT_EQ( counter , 0 );
     }
 */

@@ -50,7 +50,7 @@
 #include <Kokkos_ExecPolicy.hpp>
 #include <Kokkos_Parallel.hpp>
 
-#if defined( __CUDACC__ ) && defined( KOKKOS_HAVE_CUDA )
+#if defined( __CUDACC__ ) && defined( KOKKOS_ENABLE_CUDA )
 #include<Cuda/KokkosExp_Cuda_IterateTile.hpp>
 #endif
 
@@ -163,7 +163,8 @@ struct TileArray : public ConstArray<T, Rank>
 
 template < typename ... Args >
 struct common_index_type {
-  using type = typename std::remove_cv< typename std::common_type< Args... >::type >::type;
+  using type = typename std::remove_cv< typename std::remove_reference< typename std::common_type< Args... >::type >::type >::type;
+  // May run into cases where need to apply  std::add_lvalue_reference after the above...
   static_assert( std::is_integral<type>::value, "MDRange Error: Common argument type is not an integral type" );
 };
 
@@ -219,20 +220,22 @@ Tile(Args &&... args)
 // Begin
 // Possible to allow extra args beyond rank, that are just ignored? Requested for Intrepid2 at one point
 // If so, rank would need to be explicitly provided in some way...
+
+// Begin
 template <typename... Args>
 inline constexpr
-auto Begin( Args &&... args ) -> Impl::BeginArray< typename std::common_type<Args...>::type, sizeof...(Args) >
+auto Begin( Args &&... args ) -> Impl::BeginArray< typename Impl::common_index_type<Args...>::type, sizeof...(Args) >
 {
-  using result_type = Impl::BeginArray< typename std::common_type<Args...>::type, sizeof...(Args) >;
+  using result_type = Impl::BeginArray< typename Impl::common_index_type<Args...>::type, sizeof...(Args) >;
   return result_type(std::forward<Args>(args)...);
 }
 
 // End
 template <typename... Args>
 inline constexpr
-auto End( Args &&... args ) -> Impl::EndArray< typename std::common_type<Args...>::type, sizeof...(Args) >
+auto End( Args &&... args ) -> Impl::EndArray< typename Impl::common_index_type<Args...>::type, sizeof...(Args) >
 {
-  using result_type = Impl::EndArray< typename std::common_type<Args...>::type, sizeof...(Args) >;
+  using result_type = Impl::EndArray< typename Impl::common_index_type<Args...>::type, sizeof...(Args) >;
   return result_type(std::forward<Args>(args)...);
 }
 
@@ -268,17 +271,17 @@ auto Tile( Arg0 && arg0, Args &&... args ) -> typename std::conditional< is_mdra
 
 template <typename Arg0, typename... Args, typename = typename std::enable_if<is_mdrange_layout<Arg0>::value>::type >
 inline constexpr
-auto Tile( Arg0 && arg0, Args &&... args ) -> Impl::TileArray< typename std::common_type<Args...>::type, sizeof...(Args), Arg0 >
+auto Tile( Arg0 && arg0, Args &&... args ) -> Impl::TileArray< typename Impl::common_index_type<Args...>::type, sizeof...(Args), Arg0 >
 {
-  using result_type = Impl::TileArray< typename std::common_type<Args...>::type, sizeof...(Args), Arg0 >;
+  using result_type = Impl::TileArray< typename Impl::common_index_type<Args...>::type, sizeof...(Args), Arg0 >;
   return result_type(std::forward<Args>(args)...);
 }
 
 template <typename Arg0, typename... Args, typename = typename std::enable_if< !is_mdrange_layout<Arg0>::value>::type >
 inline constexpr
-auto Tile( Arg0 && arg0, Args &&... args ) -> Impl::TileArray< typename std::common_type<Arg0,Args...>::type, sizeof...(Args)+1u, void>
+auto Tile( Arg0 && arg0, Args &&... args ) -> Impl::TileArray< typename Impl::common_index_type<Arg0,Args...>::type, sizeof...(Args)+1u, void>
 {
-  using result_type = Impl::TileArray< typename std::common_type<Arg0,Args...>::type, sizeof...(Args)+1u, void >;
+  using result_type = Impl::TileArray< typename Impl::common_index_type<Arg0,Args...>::type, sizeof...(Args)+1u, void >;
   return result_type(std::forward<Arg0>(arg0), std::forward<Args>(args)...);
 }
 
@@ -288,9 +291,19 @@ inline constexpr
 auto TraitsFcn( Args &&... args ) -> Kokkos::Impl::PolicyTraits< Args... >
 {
   using result_type = Kokkos::Impl::PolicyTraits< Args... >;
-  //return result_type(std::forward<Args>(args)...);
   return result_type();
 }
+
+/*
+// May need this specialization for compiler issues requiring IndexType if no params given
+template <>
+inline constexpr
+auto TraitsFcn<>() -> Kokkos::Impl::PolicyTraits< Kokkos::IndexType<long> >
+{
+  using result_type = Kokkos::Impl::PolicyTraits< Kokkos::IndexType<long> >;
+  return result_type();
+}
+*/
 
 
 enum class Iterate
@@ -418,12 +431,12 @@ struct ImplMDRangePolicy
     //m_tile_end = Impl::ConstArray< index_type , rank , Impl::TileTag >::fill(1) ;
     // Host
     if ( true
-       #if defined(KOKKOS_HAVE_CUDA)
+       #if defined(KOKKOS_ENABLE_CUDA)
          && !std::is_same< typename traits::execution_space, Kokkos::Cuda >::value
        #endif
        )
     {
-      index_type span;
+      index_type span = 0;
       for (int i=0; i<rank; ++i) {
         span = upper[i] - lower[i];
 
@@ -445,10 +458,10 @@ struct ImplMDRangePolicy
         m_num_tiles *= m_tile_end[i];
       }
     }
-    #if defined(KOKKOS_HAVE_CUDA)
+    #if defined(KOKKOS_ENABLE_CUDA)
     else // Cuda
     {
-      index_type span;
+      index_type span = 0;
       for (int i=0; i<rank; ++i) {
         span = upper[i] - lower[i];
 
@@ -974,7 +987,7 @@ void md_parallel_for( MDRange const& range
                     , Functor const& f
                     , const std::string& str = ""
                     , typename std::enable_if<( true
-                      #if defined( KOKKOS_HAVE_CUDA)
+                      #if defined( KOKKOS_ENABLE_CUDA)
                       && !std::is_same< typename MDRange::range_policy::execution_space, Kokkos::Cuda>::value
                       #endif
                       ) >::type* = 0
@@ -993,7 +1006,7 @@ void md_parallel_for( const std::string& str
                     , MDRange const& range
                     , Functor const& f
                     , typename std::enable_if<( true
-                      #if defined( KOKKOS_HAVE_CUDA)
+                      #if defined( KOKKOS_ENABLE_CUDA)
                       && !std::is_same< typename MDRange::range_policy::execution_space, Kokkos::Cuda>::value
                       #endif
                       ) >::type* = 0
@@ -1008,13 +1021,13 @@ void md_parallel_for( const std::string& str
 }
 
 // Cuda specialization
-#if defined( __CUDACC__ ) && defined( KOKKOS_HAVE_CUDA )
+#if defined( __CUDACC__ ) && defined( KOKKOS_ENABLE_CUDA )
 template <typename MDRange, typename Functor>
 void md_parallel_for( const std::string& str
                     , MDRange const& range
                     , Functor const& f
                     , typename std::enable_if<( true
-                      #if defined( KOKKOS_HAVE_CUDA)
+                      #if defined( KOKKOS_ENABLE_CUDA)
                       && std::is_same< typename MDRange::range_policy::execution_space, Kokkos::Cuda>::value
                       #endif
                       ) >::type* = 0
@@ -1029,7 +1042,7 @@ void md_parallel_for( MDRange const& range
                     , Functor const& f
                     , const std::string& str = ""
                     , typename std::enable_if<( true
-                      #if defined( KOKKOS_HAVE_CUDA)
+                      #if defined( KOKKOS_ENABLE_CUDA)
                       && std::is_same< typename MDRange::range_policy::execution_space, Kokkos::Cuda>::value
                       #endif
                       ) >::type* = 0
@@ -1050,7 +1063,7 @@ void md_parallel_reduce( MDRange const& range
                     , ValueType & v
                     , const std::string& str = ""
                     , typename std::enable_if<( true
-                      #if defined( KOKKOS_HAVE_CUDA)
+                      #if defined( KOKKOS_ENABLE_CUDA)
                       && !std::is_same< typename MDRange::range_policy::execution_space, Kokkos::Cuda>::value
                       #endif
                       ) >::type* = 0
@@ -1070,7 +1083,7 @@ void md_parallel_reduce( const std::string& str
                     , Functor const& f
                     , ValueType & v
                     , typename std::enable_if<( true
-                      #if defined( KOKKOS_HAVE_CUDA)
+                      #if defined( KOKKOS_ENABLE_CUDA)
                       && !std::is_same< typename MDRange::range_policy::execution_space, Kokkos::Cuda>::value
                       #endif
                       ) >::type* = 0
@@ -1092,7 +1105,7 @@ void md_parallel_reduce( MDRange const& range
                     , ValueType & v
                     , const std::string& str = ""
                     , typename std::enable_if<( true
-                      #if defined( KOKKOS_HAVE_CUDA)
+                      #if defined( KOKKOS_ENABLE_CUDA)
                       && std::is_same< typename MDRange::range_policy::execution_space, Kokkos::Cuda>::value
                       #endif
                       ) >::type* = 0
@@ -1108,7 +1121,7 @@ void md_parallel_reduce( const std::string& str
                     , Functor const& f
                     , ValueType & v
                     , typename std::enable_if<( true
-                      #if defined( KOKKOS_HAVE_CUDA)
+                      #if defined( KOKKOS_ENABLE_CUDA)
                       && std::is_same< typename MDRange::range_policy::execution_space, Kokkos::Cuda>::value
                       #endif
                       ) >::type* = 0
