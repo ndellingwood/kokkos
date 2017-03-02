@@ -305,6 +305,16 @@ auto TraitsFcn<>() -> Kokkos::Impl::PolicyTraits< Kokkos::IndexType<long> >
 }
 */
 
+// Layout - extra (redundant) typing, but more consistent api
+template <typename LayoutType>
+inline constexpr
+LayoutType LayoutFcn( LayoutType && layout )
+{
+  //using result_type = LayoutType
+  //return result_type();
+  return layout; // return some error or default if not layout left/right; specialize for those cases
+}
+
 
 enum class Iterate
 {
@@ -791,9 +801,11 @@ MDRangePolicy( Kokkos::Experimental::Impl::BeginArray<TB,R> const& begin, Kokkos
   using BeginType = Kokkos::Experimental::Impl::BeginArray<TB,R>; 
   using EndType = Kokkos::Experimental::Impl::EndArray<TE,R>; 
   using TileType = Kokkos::Experimental::Impl::TileArray<TT,R,InnerLayout>; 
-  using Traits = Kokkos::Impl::PolicyTraits<Kokkos::IndexType<TE>> ;
 //  using Traits = Kokkos::MDRangePolicyTraits<> ;
-  using LayoutType = typename Traits::execution_space::array_layout;
+//  using Traits = Kokkos::Impl::PolicyTraits<Kokkos::IndexType<TE>> ;
+//  using LayoutType = typename Traits::execution_space::array_layout;
+  typedef typename Kokkos::Impl::PolicyTraits< Kokkos::IndexType<TE> >  Traits;
+  typedef typename Traits::execution_space::array_layout  LayoutType;
   return ImplMDRangePolicy<LayoutType, BeginType, EndType, TileType, Traits> {begin, end, tile };
 }
 
@@ -814,9 +826,11 @@ MDRangePolicy( Kokkos::Experimental::Impl::EndArray<TE,R> const& end, Kokkos::Ex
   using BeginType = Kokkos::Experimental::Impl::BeginArray<TE,R>; 
   using EndType = Kokkos::Experimental::Impl::EndArray<TE,R>; 
   using TileType = Kokkos::Experimental::Impl::TileArray<TT,R,InnerLayout>; 
-  using Traits = Kokkos::Impl::PolicyTraits<Kokkos::IndexType<TE>> ;
 //  using Traits = Kokkos::MDRangePolicyTraits<> ;
-  using LayoutType = typename Traits::execution_space::array_layout;
+//  using Traits = Kokkos::Impl::PolicyTraits<Kokkos::IndexType<TE>> ;
+//  using LayoutType = typename Traits::execution_space::array_layout;
+  typedef typename Kokkos::Impl::PolicyTraits< Kokkos::IndexType<TE> >  Traits;
+  typedef typename Traits::execution_space::array_layout  LayoutType;
   return ImplMDRangePolicy<LayoutType, BeginType, EndType, TileType, Traits> {BeginType::fill(0), end, tile };
 }
 
@@ -836,9 +850,11 @@ MDRangePolicy( Kokkos::Experimental::Impl::EndArray<TE,R> const& end )
   using BeginType = Kokkos::Experimental::Impl::BeginArray<TE,R>; 
   using EndType = Kokkos::Experimental::Impl::EndArray<TE,R>; 
   using TileType = Kokkos::Experimental::Impl::TileArray<TE,R,void>; 
-  using Traits = Kokkos::Impl::PolicyTraits< Kokkos::IndexType<TE> >;
-//  using Traits = Kokkos::MDRangePolicyTraits<> ;
-  using LayoutType = typename Traits::execution_space::array_layout;
+  // typedef may be needed for gcc/4.7.2 ...
+//  using Traits = Kokkos::Impl::PolicyTraits< Kokkos::IndexType<TE> >;
+//  using LayoutType = typename Traits::execution_space::array_layout;
+  typedef typename Kokkos::Impl::PolicyTraits< Kokkos::IndexType<TE> >  Traits;
+  typedef typename Traits::execution_space::array_layout  LayoutType;
   return ImplMDRangePolicy<LayoutType, BeginType, EndType, TileType, Traits> {BeginType::fill(0), end, TileType::fill(1)};
 }
 
@@ -859,9 +875,10 @@ MDRangePolicy( Kokkos::Experimental::Impl::BeginArray<TB,R> const& begin, Kokkos
   using BeginType = Kokkos::Experimental::Impl::BeginArray<TB,R>; 
   using EndType = Kokkos::Experimental::Impl::EndArray<TE,R>; 
   using TileType = Kokkos::Experimental::Impl::TileArray<TE,R,void>; 
-  using Traits = Kokkos::Impl::PolicyTraits<Kokkos::IndexType<TE>> ;
-//  using Traits = Kokkos::MDRangePolicyTraits<> ;
-  using LayoutType = typename Traits::execution_space::array_layout;
+//  using Traits = Kokkos::Impl::PolicyTraits<Kokkos::IndexType<TE>> ;
+//  using LayoutType = typename Traits::execution_space::array_layout;
+  typedef typename Kokkos::Impl::PolicyTraits< Kokkos::IndexType<TE> >  Traits;
+  typedef typename Traits::execution_space::array_layout  LayoutType;
   return ImplMDRangePolicy<LayoutType, BeginType, EndType, TileType, Traits> {begin, end, TileType::fill(1)};
 }
 
