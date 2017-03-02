@@ -50,7 +50,7 @@
 #include <Kokkos_ExecPolicy.hpp>
 #include <Kokkos_Parallel.hpp>
 
-#if defined( __CUDACC__ ) && defined( KOKKOS_ENABLE_CUDA )
+#if defined( __CUDACC__ ) && defined( KOKKOS_HAVE_CUDA )
 #include<Cuda/KokkosExp_Cuda_IterateTile.hpp>
 #endif
 
@@ -431,7 +431,7 @@ struct ImplMDRangePolicy
     //m_tile_end = Impl::ConstArray< index_type , rank , Impl::TileTag >::fill(1) ;
     // Host
     if ( true
-       #if defined(KOKKOS_ENABLE_CUDA)
+       #if defined(KOKKOS_HAVE_CUDA)
          && !std::is_same< typename traits::execution_space, Kokkos::Cuda >::value
        #endif
        )
@@ -458,7 +458,7 @@ struct ImplMDRangePolicy
         m_num_tiles *= m_tile_end[i];
       }
     }
-    #if defined(KOKKOS_ENABLE_CUDA)
+    #if defined(KOKKOS_HAVE_CUDA)
     else // Cuda
     {
       index_type span = 0;
@@ -987,7 +987,7 @@ void md_parallel_for( MDRange const& range
                     , Functor const& f
                     , const std::string& str = ""
                     , typename std::enable_if<( true
-                      #if defined( KOKKOS_ENABLE_CUDA)
+                      #if defined( KOKKOS_HAVE_CUDA)
                       && !std::is_same< typename MDRange::range_policy::execution_space, Kokkos::Cuda>::value
                       #endif
                       ) >::type* = 0
@@ -1006,7 +1006,7 @@ void md_parallel_for( const std::string& str
                     , MDRange const& range
                     , Functor const& f
                     , typename std::enable_if<( true
-                      #if defined( KOKKOS_ENABLE_CUDA)
+                      #if defined( KOKKOS_HAVE_CUDA)
                       && !std::is_same< typename MDRange::range_policy::execution_space, Kokkos::Cuda>::value
                       #endif
                       ) >::type* = 0
@@ -1021,13 +1021,13 @@ void md_parallel_for( const std::string& str
 }
 
 // Cuda specialization
-#if defined( __CUDACC__ ) && defined( KOKKOS_ENABLE_CUDA )
+#if defined( __CUDACC__ ) && defined( KOKKOS_HAVE_CUDA )
 template <typename MDRange, typename Functor>
 void md_parallel_for( const std::string& str
                     , MDRange const& range
                     , Functor const& f
                     , typename std::enable_if<( true
-                      #if defined( KOKKOS_ENABLE_CUDA)
+                      #if defined( KOKKOS_HAVE_CUDA)
                       && std::is_same< typename MDRange::range_policy::execution_space, Kokkos::Cuda>::value
                       #endif
                       ) >::type* = 0
@@ -1042,7 +1042,7 @@ void md_parallel_for( MDRange const& range
                     , Functor const& f
                     , const std::string& str = ""
                     , typename std::enable_if<( true
-                      #if defined( KOKKOS_ENABLE_CUDA)
+                      #if defined( KOKKOS_HAVE_CUDA)
                       && std::is_same< typename MDRange::range_policy::execution_space, Kokkos::Cuda>::value
                       #endif
                       ) >::type* = 0
@@ -1063,7 +1063,7 @@ void md_parallel_reduce( MDRange const& range
                     , ValueType & v
                     , const std::string& str = ""
                     , typename std::enable_if<( true
-                      #if defined( KOKKOS_ENABLE_CUDA)
+                      #if defined( KOKKOS_HAVE_CUDA)
                       && !std::is_same< typename MDRange::range_policy::execution_space, Kokkos::Cuda>::value
                       #endif
                       ) >::type* = 0
@@ -1083,7 +1083,7 @@ void md_parallel_reduce( const std::string& str
                     , Functor const& f
                     , ValueType & v
                     , typename std::enable_if<( true
-                      #if defined( KOKKOS_ENABLE_CUDA)
+                      #if defined( KOKKOS_HAVE_CUDA)
                       && !std::is_same< typename MDRange::range_policy::execution_space, Kokkos::Cuda>::value
                       #endif
                       ) >::type* = 0
@@ -1105,7 +1105,7 @@ void md_parallel_reduce( MDRange const& range
                     , ValueType & v
                     , const std::string& str = ""
                     , typename std::enable_if<( true
-                      #if defined( KOKKOS_ENABLE_CUDA)
+                      #if defined( KOKKOS_HAVE_CUDA)
                       && std::is_same< typename MDRange::range_policy::execution_space, Kokkos::Cuda>::value
                       #endif
                       ) >::type* = 0
@@ -1121,7 +1121,7 @@ void md_parallel_reduce( const std::string& str
                     , Functor const& f
                     , ValueType & v
                     , typename std::enable_if<( true
-                      #if defined( KOKKOS_ENABLE_CUDA)
+                      #if defined( KOKKOS_HAVE_CUDA)
                       && std::is_same< typename MDRange::range_policy::execution_space, Kokkos::Cuda>::value
                       #endif
                       ) >::type* = 0

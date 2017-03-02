@@ -60,7 +60,7 @@
 // /home/ndellin/kokkos/core/src/Cuda/Kokkos_CudaExec.hpp(84): error: incomplete type is not allowed
 // As a result, recreate cuda_parallel_launch and associated code
 
-#if (KOKKOS_ENABLE_PROFILING)
+#if (KOKKOS_HAVE_PROFILING)
 #include <impl/Kokkos_Profiling_Interface.hpp>
 #include <typeinfo>
 #endif
